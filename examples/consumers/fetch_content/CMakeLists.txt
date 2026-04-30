@@ -1,0 +1,54 @@
+cmake_minimum_required(VERSION 3.25)
+
+project(parcel_consumer_fetch_content
+        VERSION 0.1.0
+        DESCRIPTION "Standalone downstream demo: pull parcel via FetchContent"
+        LANGUAGES CXX
+)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+include(FetchContent)
+
+# ----------------------------------------------------------------------------
+# Production form (preferred): pin a published release tarball + its SHA256.
+# Reproducible, no git required at configure time, fastest to fetch on CI.
+#
+# Until a release is cut, replace `v0.1.0` and the URL_HASH placeholder with
+# real values once available. To compute SHA256 yourself:
+#
+#   curl -sL https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.1.0.tar.gz \
+#     | shasum -a 256
+#
+# FetchContent_Declare(
+#     cpp-parcel
+#     URL      https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.1.0.tar.gz
+#     URL_HASH SHA256=<REPLACE_WITH_RELEASE_TARBALL_SHA256>
+# )
+# ----------------------------------------------------------------------------
+
+# Fallback: pull by git tag. Works today, but is less reproducible than the
+# tarball form (the tag could be re-pointed; checksum drift goes unnoticed).
+FetchContent_Declare(
+        cpp-parcel
+        GIT_REPOSITORY https://github.com/aurimasniekis/cpp-parcel.git
+        GIT_TAG main
+        GIT_SHALLOW TRUE
+)
+
+# Local-validation tip: while testing this snippet *before* a release exists,
+# point CMake at the in-tree source tree:
+#
+#   cmake -S examples/consumers/fetch_content \
+#         -B /tmp/parcel-consumer-build \
+#         -DCMAKE_BUILD_TYPE=Release \
+#         -DFETCHCONTENT_SOURCE_DIR_CPP-PARCEL=$PWD
+#
+# That makes FetchContent skip the network and use $PWD instead.
+
+FetchContent_MakeAvailable(cpp-parcel)
+
+add_executable(consumer main.cpp)
+target_link_libraries(consumer PRIVATE parcel::parcel)

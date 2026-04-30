@@ -1,0 +1,40 @@
+# Doxygen configuration template for parcel.
+# Variables wrapped in @...@ are filled in by CMake's configure_file().
+
+PROJECT_NAME           = "parcel"
+PROJECT_NUMBER         = "@PROJECT_VERSION@"
+PROJECT_BRIEF          = "@PROJECT_DESCRIPTION@"
+OUTPUT_DIRECTORY       = @PARCEL_DOXYGEN_OUTPUT_DIR@
+
+INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/include @CMAKE_CURRENT_SOURCE_DIR@/README.md
+USE_MDFILE_AS_MAINPAGE = @CMAKE_CURRENT_SOURCE_DIR@/README.md
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h
+
+# Documented-only output: forces a real @brief on every public symbol.
+# Undocumented public symbols surface as warnings instead of placeholder pages.
+EXTRACT_ALL            = NO
+EXTRACT_STATIC         = YES
+HIDE_UNDOC_MEMBERS     = YES
+HIDE_UNDOC_CLASSES     = YES
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+GENERATE_TREEVIEW      = YES
+
+WARN_IF_UNDOCUMENTED   = YES
+# Flip to YES once the warning stream is clean (separate follow-up).
+WARN_AS_ERROR          = NO
+
+# First sentence of /** ... */ becomes @brief — matches the terse comment style.
+JAVADOC_AUTOBRIEF      = YES
+
+QUIET                  = YES
+ALPHABETICAL_INDEX     = YES
+SHOW_NAMESPACES        = YES
+
+# Make the 128-bit aliases visible regardless of the host compiler's detection.
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = PARCEL_HAS_INT128 __SIZEOF_INT128__
