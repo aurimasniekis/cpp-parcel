@@ -12,34 +12,30 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(FetchContent)
 
-# ----------------------------------------------------------------------------
-# Production form (preferred): pin a published release tarball + its SHA256.
-# Reproducible, no git required at configure time, fastest to fetch on CI.
-#
-# Until a release is cut, replace `v0.1.0` and the URL_HASH placeholder with
-# real values once available. To compute SHA256 yourself:
+# Pin a published release tarball + its SHA256. Reproducible, no git required
+# at configure time, fastest to fetch on CI. To compute SHA256 yourself:
 #
 #   curl -sL https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.1.0.tar.gz \
 #     | shasum -a 256
-#
-# FetchContent_Declare(
-#     cpp-parcel
-#     URL      https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.1.0.tar.gz
-#     URL_HASH SHA256=<REPLACE_WITH_RELEASE_TARBALL_SHA256>
-# )
-# ----------------------------------------------------------------------------
-
-# Fallback: pull by git tag. Works today, but is less reproducible than the
-# tarball form (the tag could be re-pointed; checksum drift goes unnoticed).
 FetchContent_Declare(
         cpp-parcel
-        GIT_REPOSITORY https://github.com/aurimasniekis/cpp-parcel.git
-        GIT_TAG main
-        GIT_SHALLOW TRUE
+        URL      https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.1.0.tar.gz
+        URL_HASH SHA256=d9d5550580c30cc30816448b986d1dcd8e0c267a8f98ad3b2d496d806d834020
 )
 
-# Local-validation tip: while testing this snippet *before* a release exists,
-# point CMake at the in-tree source tree:
+# Fallback: pull by git tag. Less reproducible than the tarball form (the tag
+# could be re-pointed; checksum drift goes unnoticed). Uncomment if you need
+# to track an unreleased commit.
+#
+# FetchContent_Declare(
+#         cpp-parcel
+#         GIT_REPOSITORY https://github.com/aurimasniekis/cpp-parcel.git
+#         GIT_TAG v0.1.0
+#         GIT_SHALLOW TRUE
+# )
+
+# Local-validation tip: to test this snippet against an in-tree checkout,
+# point CMake at the source tree:
 #
 #   cmake -S examples/consumers/fetch_content \
 #         -B /tmp/parcel-consumer-build \
