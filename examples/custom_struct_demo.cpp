@@ -4,7 +4,7 @@
 //   1. Define the payload as a plain C++ struct.
 //   2. Subclass parcel::StructCell<MyCell, MyPayload, "my_id"> — the bare
 //      struct id goes in the template arg list; "s:" is added by the framework.
-//   3. Provide static meta_info() and static field_descriptors() built with
+//   3. Provide static display_info() and static field_descriptors() built with
 //      FieldsBuilder.
 //   4. Register the cell next to every kind it references — define() will
 //      surface anything missing with a clear error.
@@ -93,7 +93,7 @@ public:
                                                      parcel::ParcelRegistry const&) {
         auto v = base_t::cell_from_json<Uuid>(j, kind_id);
         auto cell = std::make_shared<UuidCell>(v);
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
@@ -133,7 +133,7 @@ class DocumentCell : public parcel::StructCell<DocumentCell, Document, "document
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Document", .description = "An indexed document"};
     }
 

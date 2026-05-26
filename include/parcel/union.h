@@ -47,10 +47,10 @@ public:
     using base_t = BaseCellTypeDescriptor<UnionCell<Ts...>>;
 
     /**
-     * @brief Construct with the given descriptive metadata.
-     * @param meta Descriptive metadata.
+     * @brief Construct with the given display info.
+     * @param info Display info.
      */
-    explicit UnionCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
+    explicit UnionCellTypeDescriptor(DisplayInfo info) : base_t(std::move(info)) {}
 
     /** @brief Compile-time array of every alternative's kind id. */
     [[nodiscard]] static constexpr std::array<std::string_view, sizeof...(Ts)> alternatives() {
@@ -227,7 +227,7 @@ public:
                 {ICell::KEY_VALUE, wrapper.to_json()},
             };
         });
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
@@ -243,7 +243,7 @@ public:
                 }
                 out->value.template emplace<I>(std::move(typed->value));
             });
-        out->meta_ = this->meta_;
+        out->display_info_ = this->display_info_;
         return out;
     }
 
@@ -308,7 +308,7 @@ public:
         }
         const auto active = it_inner_k->get<std::string_view>();
         cell_t out = dispatch_from_json(active, *it_v, reg, std::index_sequence_for<Ts...>{});
-        base_t::absorb_meta(j, out);
+        base_t::absorb_display_info(j, out);
         return out;
     }
 

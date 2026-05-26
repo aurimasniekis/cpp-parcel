@@ -35,7 +35,7 @@ class StreetAddressCell
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "StreetAddress", .description = "Postal address"};
     }
 
@@ -55,7 +55,7 @@ class HomeAddressCell : public parcel::StructCell<HomeAddressCell, HomeAddress, 
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "HomeAddress"};
     }
 
@@ -76,7 +76,7 @@ class HomeAddressTrimmedCell
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "HomeAddressTrimmed"};
     }
 

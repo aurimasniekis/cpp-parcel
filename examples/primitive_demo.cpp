@@ -48,7 +48,7 @@ int main() {
     std::cout << "restored kind            = " << restored_via_desc->kind() << '\n';
     std::cout << "restored to_string       = " << restored_via_desc << '\n';
 
-    print_section("Descriptor metadata");
+    print_section("Descriptor display info");
     std::cout << parcel::DoubleCell::descriptor()->to_json().dump(2) << '\n';
 
     print_section("clone()");

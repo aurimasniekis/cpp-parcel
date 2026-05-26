@@ -9,7 +9,7 @@ Wrappable, wire-transferable C++23 value system with JSON serialization.
 A *cell* is a typed value that knows how to serialize itself to JSON and
 back. parcel ships a small family of cells — primitives, lists, maps,
 hash-maps, structs, unions — that all share one wire shape:
-`{"k": <kind>, "v": <value>, "d": <optional meta>}`. A `ParcelRegistry`
+`{"k": <kind>, "v": <value>, "d": <optional display info>}`. A `ParcelRegistry`
 dispatches incoming JSON back to the right cell type so heterogeneous
 payloads round-trip safely.
 
@@ -123,8 +123,8 @@ filesystem, hash maps), and the formatting and walking helpers.
 
 ## Wire format
 
-Every cell serializes to `{"k": <kind>, "v": <value>, "d": <meta>}`. The
-`"d"` block is omitted when no meta is set. Inside a struct cell, every
+Every cell serializes to `{"k": <kind>, "v": <value>, "d": <display info>}`. The
+`"d"` block is omitted when no display info is set. Inside a struct cell, every
 field is itself a `{k, v}` cell:
 
 ```json
@@ -253,7 +253,7 @@ public:
 |-----------------------|-----------|------------------------------------------------------------------------|
 | `kind_id`             | auto      | synthesized as `"s:" + StructId` — never declare it manually           |
 | `field_descriptors()` | yes       | returns the result of a `FieldsBuilder<Payload>{}.field<…>(…).build()` |
-| `meta_info()`         | optional  | cell-level meta; defaults to an empty `parcel::descriptor::MetaInfo{}` |
+| `display_info()`      | optional  | cell-level display info; defaults to an empty `parcel::DisplayInfo{}`  |
 | `allow_extra_fields`  | optional  | `true` opts into lenient deserialization; defaults to `false`          |
 
 ### Capture extra struct fields
@@ -329,13 +329,13 @@ public:
                                     parcel::ParcelRegistry const&) {
         auto v = base_t::cell_from_json<Uuid>(j, kind_id);
         auto cell = std::make_shared<UuidCell>(v);
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
     static parcel::cell_type_descriptor_t descriptor() {
         static const auto d = std::make_shared<parcel::SimpleCellTypeDescriptor<UuidCell>>(
-            parcel::descriptor::MetaInfo{.name = "Uuid"});
+            parcel::DisplayInfo{.name = "Uuid"});
         return d;
     }
 };
@@ -430,12 +430,12 @@ eligible. `Cell::of(args...)` skips the lookup and forwards straight to
 [`examples/cell_handle_demo.cpp`](examples/cell_handle_demo.cpp) for
 more on `cell_t` ownership.)*
 
-### Annotate cells with meta
+### Annotate cells with display info
 
-Every cell can carry a small metadata block — `name`, `description`,
+Every cell can carry a small display-info block — `name`, `description`,
 `icon`, `color` — that travels with the value under `"d"`. Builders are
 immutable: each returns a fresh cell. *(See
-[`examples/meta_demo.cpp`](examples/meta_demo.cpp).)*
+[`examples/display_info_demo.cpp`](examples/display_info_demo.cpp).)*
 
 ```cpp
 auto annotated = parcel::I32Cell::of(42)
@@ -448,10 +448,12 @@ std::cout << annotated->to_json().dump(2);
 // {"k":"i32","v":42,"d":{"name":"Answer", ...}}
 ```
 
-`with_meta(MetaInfo{...})` replaces the whole block at once. Reading
-goes through `cell->meta()`, which returns a `std::optional<MetaInfo>`.
-Comparison and hashing both ignore meta — two cells with the same `k`/`v`
-but different `meta()` are equivalent.
+`with_display_info(DisplayInfo{...})` replaces the whole block at once
+(the accessor and builder are named for the `DisplayInfo` they carry; the
+wire key stays the terse `"d"`). Reading goes through
+`cell->overridden_display_info()`, which returns a `std::optional<DisplayInfo>`.
+Comparison and hashing both ignore display info — two cells with the same
+`k`/`v` but different `overridden_display_info()` are equivalent.
 
 ### Lists & maps
 
@@ -620,7 +622,7 @@ want a shared base across many struct cells.
 |-----------------------|-----------|-----------------------------------------------------------------------------|
 | `kind_id`             | yes       | declared by the deriving class (often via `id_join_lit_v` in the CRTP base) |
 | `field_descriptors()` | yes       | returns the result of a `FieldsBuilder<Derived>{}.field<…>(…).build()`      |
-| `meta_info()`         | optional  | cell-level meta; defaults to an empty `parcel::descriptor::MetaInfo{}`      |
+| `display_info()`      | optional  | cell-level display info; defaults to an empty `parcel::DisplayInfo{}`       |
 | `allow_extra_fields`  | optional  | `true` opts into lenient deserialization; defaults to `false`               |
 
 ### Optional adapters for downstream libraries
@@ -662,7 +664,7 @@ Every cell supports `operator==` and `operator<=>`
 with NaN — aren't totally ordered). `std::hash<parcel::cell_t>` and
 `std::hash<parcel::ICell>` are specialized too, so cells drop into
 `std::set` / `std::unordered_set`. Comparison and hashing both ignore
-meta.
+display info.
 
 ### Type-safe casting
 
@@ -849,7 +851,7 @@ Run the full test suite with `make test` (or `ctest --test-dir build
   `allow_extra_fields`.
 - `test_union.cpp` — `UnionCell`, active tracking, `get<I>` / `get<S>`.
 - `test_registry.cpp` — registry dispatch, introspection, schema export.
-- `test_meta.cpp` — `MetaInfo` and immutable `with_*` builders.
+- `test_display_info.cpp` — `DisplayInfo` and immutable `with_*` builders.
 - `test_compare.cpp` — `operator==`, `operator<=>`, `std::hash`.
 - `test_cell_helpers.cpp` — `parcel::cell()`, `Cell::of()`, `cell_cast`,
   `as`, `value_or`.

@@ -43,7 +43,7 @@ public:
     using cell_type = TypedHashMapCell<T>;
     using base_t = BaseCellTypeDescriptor<TypedHashMapCell<T>>;
 
-    explicit TypedHashMapCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
+    explicit TypedHashMapCellTypeDescriptor(DisplayInfo info) : base_t(std::move(info)) {}
 
     [[nodiscard]] descriptor::CellCategory category() const override {
         return descriptor::CellCategory::TypedMap;
@@ -145,7 +145,7 @@ public:
             {ICell::KEY_KIND, kind_id},
             {ICell::KEY_VALUE, std::move(obj)},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
@@ -207,7 +207,7 @@ public:
             elems.emplace(key, std::move(typed->value));
         }
         auto cell = std::make_shared<TypedHashMapCell<T>>(std::move(elems));
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
@@ -306,7 +306,7 @@ public:
             {ICell::KEY_KIND, kind_id},
             {ICell::KEY_VALUE, std::move(obj)},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
@@ -316,7 +316,7 @@ public:
             copied.emplace(k, v ? v->clone() : nullptr);
         }
         auto out = std::make_shared<HashMapCell>(std::move(copied));
-        out->meta_ = this->meta_;
+        out->display_info_ = this->display_info_;
         return out;
     }
 
@@ -395,7 +395,7 @@ public:
             elems.emplace(k, raw.is_null() ? cell_t{} : reg.cell_from_json(raw));
         }
         auto cell = std::make_shared<HashMapCell>(std::move(elems));
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
@@ -413,7 +413,7 @@ public:
     using cell_type = HashMapCell;
     using base_t = BaseCellTypeDescriptor<HashMapCell>;
 
-    explicit HashMapCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
+    explicit HashMapCellTypeDescriptor(DisplayInfo info) : base_t(std::move(info)) {}
 
     [[nodiscard]] descriptor::CellCategory category() const override {
         return descriptor::CellCategory::Map;

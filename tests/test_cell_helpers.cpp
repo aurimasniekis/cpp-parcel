@@ -121,17 +121,17 @@ TEST(AsAndValueOr, value_or_returns_fallback_on_null) {
 // ---------------------------------------------------------------------------
 // from_json_strict (B10)
 
-TEST(FromJsonStrict, builds_cell_and_absorbs_meta) {
+TEST(FromJsonStrict, builds_cell_and_absorbs_display_info) {
     parcel::I32Cell src{42};
-    auto with_meta = src.with_name("answer");
-    auto j = with_meta->to_json();
+    auto with_display_info = src.with_name("answer");
+    auto j = with_display_info->to_json();
 
     auto rebuilt = parcel::I32Cell::from_json_strict(j);
     auto* typed = dynamic_cast<parcel::I32Cell*>(rebuilt.get());
     ASSERT_NE(typed, nullptr);
     EXPECT_EQ(typed->value, 42);
-    ASSERT_TRUE(typed->meta().has_value());
-    EXPECT_EQ(typed->meta()->name, "answer");
+    ASSERT_TRUE(typed->overridden_display_info().has_value());
+    EXPECT_EQ(typed->overridden_display_info()->name, "answer");
 }
 
 TEST(FromJsonStrict, throws_on_kind_mismatch) {
@@ -188,10 +188,10 @@ TEST(CellHash, differing_value_changes_hash) {
     EXPECT_NE(std::hash<parcel::ICell>{}(a), std::hash<parcel::ICell>{}(b));
 }
 
-TEST(CellHash, meta_does_not_change_hash_for_primitive) {
+TEST(CellHash, display_info_does_not_change_hash_for_primitive) {
     const auto a = parcel::I32Cell::of(42);
     const auto b = parcel::I32Cell::of(42)->with_name("answer");
-    // Hash uses just kind and value JSON, so meta is ignored.
+    // Hash uses just kind and value JSON, so display info is ignored.
     EXPECT_EQ(std::hash<parcel::cell_t>{}(a), std::hash<parcel::cell_t>{}(b));
 }
 
@@ -250,15 +250,15 @@ TEST(BaseCellUnique, forwards_constructor_args) {
 
 TEST(FromJsonStrict, instantiates_for_string_cell) {
     parcel::StringCell src{std::string("payload")};
-    auto with_meta = src.with_description("note");
-    auto j = with_meta->to_json();
+    auto with_display_info = src.with_description("note");
+    auto j = with_display_info->to_json();
 
     auto rebuilt = parcel::StringCell::from_json_strict(j);
     auto* typed = dynamic_cast<parcel::StringCell*>(rebuilt.get());
     ASSERT_NE(typed, nullptr);
     EXPECT_EQ(typed->value, "payload");
-    ASSERT_TRUE(typed->meta().has_value());
-    EXPECT_EQ(typed->meta()->description, "note");
+    ASSERT_TRUE(typed->overridden_display_info().has_value());
+    EXPECT_EQ(typed->overridden_display_info()->description, "note");
 }
 
 TEST(FromJsonStrict, instantiates_for_bool_cell) {

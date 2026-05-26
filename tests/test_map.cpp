@@ -288,13 +288,13 @@ TEST(TypedMapCell, descriptor_exposes_element_kind) {
     EXPECT_EQ(typed->element_kind(), "i32");
 }
 
-TEST(TypedMapCell, descriptor_to_json_includes_kind_meta_and_element_kind) {
+TEST(TypedMapCell, descriptor_to_json_includes_kind_display_info_and_element_kind) {
     const auto d = parcel::TypedMapCell<parcel::I32Cell>::descriptor();
     const auto j = d->to_json();
     EXPECT_EQ(j["kind"].get<std::string>(), "m:i32");
     EXPECT_EQ(j["element_kind"].get<std::string>(), "i32");
-    ASSERT_TRUE(j.contains("meta"));
-    EXPECT_EQ(j["meta"]["name"].get<std::string>(), "Map");
+    ASSERT_TRUE(j.contains("display_info"));
+    EXPECT_EQ(j["display_info"]["name"].get<std::string>(), "Map");
 }
 
 TEST(TypedMapCell, descriptor_cell_from_json_round_trip) {
@@ -490,11 +490,11 @@ TEST(MapCell, descriptor_is_cached) {
     EXPECT_EQ(d1.get(), d2.get());
 }
 
-TEST(MapCell, descriptor_to_json_has_kind_meta_no_element_kind) {
+TEST(MapCell, descriptor_to_json_has_kind_display_info_no_element_kind) {
     const auto d = parcel::MapCell::descriptor();
     const auto j = d->to_json();
     EXPECT_EQ(j["kind"].get<std::string>(), "m");
-    ASSERT_TRUE(j.contains("meta"));
+    ASSERT_TRUE(j.contains("display_info"));
     EXPECT_FALSE(j.contains("element_kind"))
         << "heterogeneous descriptor must not advertise an element_kind";
 }

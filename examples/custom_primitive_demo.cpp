@@ -84,7 +84,7 @@ inline void from_json(parcel::json_t const& j, Uuid& u) {
 // 3. The cell.
 
 class UuidCell : public parcel::BaseCell<UuidCell, Uuid> {
-    using base_t = parcel::BaseCell<UuidCell, Uuid>;
+    using base_t = BaseCell<UuidCell, Uuid>;
 
 public:
     using base_t::base_t;
@@ -98,9 +98,9 @@ public:
 
     [[maybe_unused]] static parcel::cell_t from_json(parcel::json_t const& j,
                                                      parcel::ParcelRegistry const&) {
-        auto v = base_t::cell_from_json<Uuid>(j, kind_id);
+        auto v = cell_from_json<Uuid>(j, kind_id);
         auto cell = std::make_shared<UuidCell>(v);
-        base_t::absorb_meta(j, cell);
+        absorb_display_info(j, cell);
         return cell;
     }
 
@@ -139,7 +139,7 @@ class AccountCell : public parcel::StructCell<AccountCell, Account, "account"> {
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Account"};
     }
 

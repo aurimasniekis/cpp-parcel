@@ -330,7 +330,7 @@ struct Payload {
 class PayloadCell : public parcel::StructCell<PayloadCell, Payload, "payload"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Payload"};
     }
     [[maybe_unused]] static auto field_descriptors() {

@@ -41,7 +41,7 @@ public:
         timestamp_ = v;
     }
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Event", .description = "Common event base"};
     }
 

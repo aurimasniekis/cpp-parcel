@@ -22,7 +22,7 @@ public:
 
     [[maybe_unused]] static constexpr bool allow_extra_fields = true;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Event"};
     }
 

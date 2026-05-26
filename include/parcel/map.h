@@ -57,10 +57,10 @@ public:
     using base_t = BaseCellTypeDescriptor<TypedMapCell<T>>;
 
     /**
-     * @brief Construct with the given descriptive metadata.
-     * @param meta Descriptive metadata.
+     * @brief Construct with the given display info.
+     * @param info Display info.
      */
-    explicit TypedMapCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
+    explicit TypedMapCellTypeDescriptor(DisplayInfo info) : base_t(std::move(info)) {}
 
     /** @brief Wire kind id of the map's value type. */
     [[nodiscard]] std::string_view element_kind() const {
@@ -274,13 +274,13 @@ public:
             {ICell::KEY_KIND, kind_id},
             {ICell::KEY_VALUE, std::move(obj)},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
     /**
      * @brief Lexicographic three-way comparison over (key, value) pairs;
-     *        ignores meta.
+     *        ignores display info.
      *
      * Each value pair is wrapped in `T` and routed through `T::compare` so
      * element types whose raw storage lacks `==` still compare correctly.
@@ -357,7 +357,7 @@ public:
             elems.emplace(key, std::move(typed->value));
         }
         auto cell = std::make_shared<TypedMapCell<T>>(std::move(elems));
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
@@ -526,7 +526,7 @@ public:
             {ICell::KEY_KIND, kind_id},
             {ICell::KEY_VALUE, std::move(obj)},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
@@ -536,7 +536,7 @@ public:
             copied.emplace(key, el ? el->clone() : nullptr);
         }
         auto out = std::make_shared<MapCell>(std::move(copied));
-        out->meta_ = this->meta_;
+        out->display_info_ = this->display_info_;
         return out;
     }
 
@@ -553,7 +553,7 @@ public:
     }
 
     /**
-     * @brief Lexicographic three-way comparison over keys then values; ignores meta.
+     * @brief Lexicographic three-way comparison over keys then values; ignores display info.
      *
      * Walks the (sorted) key sequences in lockstep. Null values compare less
      * than non-null at the same key.
@@ -622,7 +622,7 @@ public:
             elems.emplace(key, raw.is_null() ? cell_t{} : reg.cell_from_json(raw));
         }
         auto cell = std::make_shared<MapCell>(std::move(elems));
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
@@ -644,7 +644,7 @@ public:
     using cell_type = MapCell;
     using base_t = BaseCellTypeDescriptor<MapCell>;
 
-    explicit MapCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
+    explicit MapCellTypeDescriptor(DisplayInfo info) : base_t(std::move(info)) {}
 
     [[nodiscard]] descriptor::CellCategory category() const override {
         return descriptor::CellCategory::Map;

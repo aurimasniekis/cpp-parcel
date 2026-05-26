@@ -65,8 +65,8 @@ struct ICellTypeDescriptor {
     /** @brief Wire-stable kind identifier. */
     [[nodiscard]] virtual std::string_view kind() const = 0;
 
-    /** @brief Descriptive metadata for this cell type. */
-    [[nodiscard]] virtual DisplayInfo meta() const = 0;
+    /** @brief Display info for this cell type. */
+    [[nodiscard]] virtual DisplayInfo display_info() const = 0;
 
     /** @brief Coarse classification (primitive, list, struct, …). */
     [[nodiscard]] virtual descriptor::CellCategory category() const = 0;
@@ -85,7 +85,7 @@ struct ICellTypeDescriptor {
                                                 ParcelRegistry const& reg) const = 0;
 
     /**
-     * @brief Serialize the descriptor itself (kind + meta + category + extras).
+     * @brief Serialize the descriptor itself (kind + display info + category + extras).
      * @return JSON object describing this cell type.
      */
     [[nodiscard]] virtual json_t to_json() const = 0;
@@ -105,15 +105,15 @@ struct IFieldDescriptor {
     /** @brief Cell kind id for the field's value type. */
     [[nodiscard]] virtual std::string_view kind() const = 0;
 
-    /** @brief Descriptive metadata for this field. */
-    [[nodiscard]] virtual DisplayInfo meta() const = 0;
+    /** @brief Display info for this field. */
+    [[nodiscard]] virtual DisplayInfo display_info() const = 0;
 
     /** @brief Whether the field must be present on deserialization. */
     [[nodiscard]] virtual bool is_required() const = 0;
 
     /**
      * @brief Serialize the field descriptor itself.
-     * @return JSON object with `key`, `kind`, `meta`, `required`.
+     * @return JSON object with `key`, `kind`, `display_info`, `required`.
      */
     [[nodiscard]] virtual json_t to_json() const = 0;
 };
@@ -170,17 +170,17 @@ public:
     static constexpr std::string_view kind_id = T::kind_id;
 
     /**
-     * @brief Construct with the given descriptive metadata.
-     * @param meta Descriptive metadata.
+     * @brief Construct with the given display info.
+     * @param info Display info.
      */
-    explicit BaseCellTypeDescriptor(DisplayInfo meta) : meta_(std::move(meta)) {}
+    explicit BaseCellTypeDescriptor(DisplayInfo info) : display_info_(std::move(info)) {}
 
     [[nodiscard]] std::string_view kind() const override {
         return kind_id;
     }
 
-    [[nodiscard]] DisplayInfo meta() const override {
-        return meta_;
+    [[nodiscard]] DisplayInfo display_info() const override {
+        return display_info_;
     }
 
     [[nodiscard]] std::type_index storage_type() const override {
@@ -192,17 +192,17 @@ public:
     }
 
 protected:
-    /** @brief Stored descriptive metadata. */
-    DisplayInfo meta_;
+    /** @brief Stored display info. */
+    DisplayInfo display_info_;
 
     /**
-     * @brief Common JSON skeleton (`kind`, `meta`, `category`) reused by overrides.
+     * @brief Common JSON skeleton (`kind`, `display_info`, `category`) reused by overrides.
      * @return Base JSON object that derived `to_json` overrides extend.
      */
     [[nodiscard]] json_t base_to_json() const {
         return json_t{
             {"kind", kind_id},
-            {"meta", json_t(meta_)},
+            {"display_info", json_t(display_info_)},
             {"category", this->category()},
         };
     }
@@ -222,11 +222,11 @@ public:
     using cell_type = T;
 
     /**
-     * @brief Construct with the given descriptive metadata.
-     * @param meta Descriptive metadata.
+     * @brief Construct with the given display info.
+     * @param info Display info.
      */
-    explicit SimpleCellTypeDescriptor(DisplayInfo meta)
-        : BaseCellTypeDescriptor<T>(std::move(meta)) {}
+    explicit SimpleCellTypeDescriptor(DisplayInfo info)
+        : BaseCellTypeDescriptor<T>(std::move(info)) {}
 
     [[nodiscard]] descriptor::CellCategory category() const override {
         return descriptor::CellCategory::Primitive;

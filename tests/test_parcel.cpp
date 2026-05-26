@@ -228,9 +228,9 @@ TEST(parcel, i128_from_json_rejects_non_digit) {
 #endif  // COMMONS_HAS_INT128
 
 // ---------------------------------------------------------------------------
-// descriptor/meta.h round-trip through nlohmann::adl
+// DisplayInfo round-trip through nlohmann::adl
 
-TEST(parcel, meta_info_from_json_round_trips_all_fields) {
+TEST(parcel, display_info_from_json_round_trips_all_fields) {
     const parcel::DisplayInfo original{
         .name = "Demo",
         .description = "desc",
@@ -251,7 +251,7 @@ TEST(parcel, meta_info_from_json_round_trips_all_fields) {
     EXPECT_EQ(restored.color, comms::Color::parse("red"));
 }
 
-TEST(parcel, meta_info_from_json_partial_input_leaves_others_default) {
+TEST(parcel, display_info_from_json_partial_input_leaves_others_default) {
     const parcel::json_t j = {{"name", "Only"}};
     const auto restored = j.get<parcel::DisplayInfo>();
     EXPECT_EQ(restored.name, "Only");

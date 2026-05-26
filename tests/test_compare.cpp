@@ -24,7 +24,7 @@ class PersonCell : public parcel::StructCell<PersonCell, Person, "person"> {
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Person"};
     }
 
@@ -43,7 +43,7 @@ public:
     SelfNode() = default;
     SelfNode(const std::int32_t v, std::string s) : value_(v), text_(std::move(s)) {}
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "SelfNode"};
     }
 
@@ -94,7 +94,7 @@ TEST(CellCompare, primitives_different_kinds_compare_by_kind) {
     EXPECT_TRUE(static_cast<parcel::ICell const&>(i) < static_cast<parcel::ICell const&>(s));
 }
 
-TEST(CellCompare, primitives_meta_is_ignored_in_equality) {
+TEST(CellCompare, primitives_display_info_is_ignored_in_equality) {
     const auto a = parcel::I32Cell::of(42);
     const auto b = parcel::I32Cell::of(42)->with_name("answer");
     EXPECT_EQ(*a, *b);
@@ -244,7 +244,7 @@ TEST(CellCompare, struct_compares_field_by_field) {
     EXPECT_NE(a, c);
 }
 
-TEST(CellCompare, struct_meta_does_not_affect_compare) {
+TEST(CellCompare, struct_display_info_does_not_affect_compare) {
     const auto a = std::make_shared<PersonCell>(Person{5, "x"});
     const auto b = a->with_name("renamed");
     EXPECT_EQ(*a, *b);
@@ -356,9 +356,9 @@ TEST(CellCompare, roundtrip_struct_equal_after_json) {
 // Hash equality-consistency: two cells that compare equal under
 // `operator==` must hash equal, even when nested children carry differing
 // DisplayInfo. The list/map/hashmap overrides recurse via hash_value() so
-// nested meta is never observed.
+// nested display info is never observed.
 
-TEST(CellCompare, list_hash_ignores_nested_meta) {
+TEST(CellCompare, list_hash_ignores_nested_display_info) {
     const parcel::ListCell a{
         parcel::cell(1)->with_description("plain"),
         parcel::cell(std::string("hi")),
@@ -371,7 +371,7 @@ TEST(CellCompare, list_hash_ignores_nested_meta) {
     EXPECT_EQ(std::hash<parcel::ICell>{}(a), std::hash<parcel::ICell>{}(b));
 }
 
-TEST(CellCompare, map_hash_ignores_nested_meta) {
+TEST(CellCompare, map_hash_ignores_nested_display_info) {
     const parcel::MapCell a{
         {"x", parcel::cell(1)->with_name("primary")},
     };
@@ -382,7 +382,7 @@ TEST(CellCompare, map_hash_ignores_nested_meta) {
     EXPECT_EQ(std::hash<parcel::ICell>{}(a), std::hash<parcel::ICell>{}(b));
 }
 
-TEST(CellCompare, hashmap_hash_ignores_nested_meta_and_iteration_order) {
+TEST(CellCompare, hashmap_hash_ignores_nested_display_info_and_iteration_order) {
     parcel::HashMapCell a{
         {"x", parcel::cell(1)->with_color("red")},
         {"y", parcel::cell(2)},

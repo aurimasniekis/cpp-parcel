@@ -57,7 +57,7 @@ public:
     static cell_t from_json(json_t const& j, ParcelRegistry const&) {
         auto v = base_t::cell_from_json<comms::Color>(j, kind_id);
         auto cell = std::make_shared<ColorCell>(v);
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
@@ -87,7 +87,7 @@ public:
     static cell_t from_json(json_t const& j, ParcelRegistry const&) {
         auto v = base_t::cell_from_json<comms::Icon>(j, kind_id);
         auto cell = std::make_shared<IconCell>(v);
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
@@ -117,14 +117,14 @@ public:
     static cell_t from_json(json_t const& j, ParcelRegistry const&) {
         auto v = base_t::cell_from_json<comms::DisplayInfo>(j, kind_id);
         auto cell = std::make_shared<DisplayInfoCell>(std::move(v));
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
     static cell_type_descriptor_t descriptor() {
         static const auto d = std::make_shared<SimpleCellTypeDescriptor<DisplayInfoCell>>(
             DisplayInfo{.name = "DisplayInfo",
-                        .description = "Presentation metadata (name/description/icon/color)"});
+                        .description = "Presentation display info (name/description/icon/color)"});
         return d;
     }
 };
@@ -151,7 +151,7 @@ public:
     static cell_t from_json(json_t const& j, ParcelRegistry const&) {
         auto v = base_t::cell_from_json<comms::FlagRef>(j, kind_id);
         auto cell = std::make_shared<FlagCell>(v);
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
@@ -194,7 +194,7 @@ public:
     static cell_t from_json(json_t const& j, ParcelRegistry const&) {
         auto v = base_t::cell_from_json<comms::FlagSet>(j, kind_id);
         auto cell = std::make_shared<FlagSetCell>(std::move(v));
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 

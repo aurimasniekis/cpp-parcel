@@ -110,7 +110,8 @@ int main() {
     const auto rebuilt = parcel::I32Cell::from_json_strict(j);
     const auto* typed = dynamic_cast<parcel::I32Cell*>(rebuilt.get());
     std::cout << "rebuilt.value = " << typed->value << '\n';
-    std::cout << "rebuilt.meta.name = " << typed->meta()->name.value_or("<unset>") << '\n';
+    std::cout << "rebuilt.display_info.name = "
+              << typed->overridden_display_info()->name.value_or("<unset>") << '\n';
 
     print_section("walk_to_vector — depth-first (path, kind) over a tree");
     auto inner = parcel::MapCell::of(std::map<std::string, parcel::cell_t>{

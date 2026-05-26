@@ -27,7 +27,7 @@ struct PathPayload {
 class PathPayloadCell : public parcel::StructCell<PathPayloadCell, PathPayload, "path_payload"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "PathPayload"};
     }
     [[maybe_unused]] static auto field_descriptors() {

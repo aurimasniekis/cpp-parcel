@@ -45,7 +45,7 @@ template <typename T>
 inline constexpr bool is_std_complex_v = is_std_complex<T>::value;
 
 /**
- * @brief Trait carrying wire id and default meta for a primitive storage type.
+ * @brief Trait carrying wire id and default display info for a primitive storage type.
  *
  * Specialized for every type accepted by the `PrimitiveStorage` concept.
  * Each specialization exposes:
@@ -309,7 +309,7 @@ concept PrimitiveStorage =
  * serializers pulled in through `json.h`.
  *
  * @tparam T A type satisfying `PrimitiveStorage`.
- * @see PrimitiveTraits — wire id and default meta per @p T.
+ * @see PrimitiveTraits — wire id and default display info per @p T.
  * @see SimpleCellTypeDescriptor — descriptor used by `descriptor()`.
  */
 template <PrimitiveStorage T>
@@ -388,7 +388,7 @@ public:
     static cell_t from_json(json_t const& j, ParcelRegistry const&) {
         auto value = base_t::template cell_from_json<T>(j, trait_t::type_id);
         auto cell = std::make_shared<PrimitiveCell<T>>(std::move(value));
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 

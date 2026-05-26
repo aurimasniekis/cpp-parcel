@@ -35,7 +35,7 @@ int main() {
     std::cout << "to_string = " << icon->to_string() << '\n';
     std::cout << "to_json   = " << icon->to_json().dump() << '\n';
 
-    print_section("DisplayInfoCell — presentation metadata object");
+    print_section("DisplayInfoCell — presentation display-info object");
     const comms::DisplayInfo di{
         .name = "Launch",
         .description = "Start the mission",

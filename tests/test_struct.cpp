@@ -20,7 +20,7 @@ class ActionCell : public parcel::StructCell<ActionCell, Action, "action"> {
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Action", .description = "An action"};
     }
 
@@ -46,7 +46,7 @@ class NoteCell : public parcel::StructCell<NoteCell, Note, "note"> {
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Note"};
     }
 
@@ -67,7 +67,7 @@ public:
 
     [[maybe_unused]] static constexpr bool allow_extra_fields = true;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "LenientAction"};
     }
 
@@ -362,12 +362,12 @@ TEST(StructCell, descriptor_is_cached) {
     EXPECT_EQ(d1.get(), d2.get());
 }
 
-TEST(StructCell, descriptor_to_json_includes_kind_meta_category_and_fields) {
+TEST(StructCell, descriptor_to_json_includes_kind_display_info_category_and_fields) {
     auto d = ActionCell::descriptor();
     const auto j = d->to_json();
     EXPECT_EQ(j["kind"].get<std::string>(), "s:action");
-    ASSERT_TRUE(j.contains("meta"));
-    EXPECT_EQ(j["meta"]["name"].get<std::string>(), "Action");
+    ASSERT_TRUE(j.contains("display_info"));
+    EXPECT_EQ(j["display_info"]["name"].get<std::string>(), "Action");
     EXPECT_EQ(j["category"].get<std::string>(), "struct");
     ASSERT_TRUE(j.contains("fields"));
     ASSERT_TRUE(j["fields"].is_array());
@@ -381,12 +381,12 @@ TEST(StructCell, descriptor_to_json_includes_kind_meta_category_and_fields) {
     EXPECT_EQ(j["fields"][2]["kind"].get<std::string>(), "bool");
 }
 
-TEST(StructCell, descriptor_field_meta_carries_builder_values) {
+TEST(StructCell, descriptor_field_display_info_carries_builder_values) {
     const auto d = ActionCell::descriptor();
     const auto j = d->to_json();
-    EXPECT_EQ(j["fields"][0]["meta"]["name"].get<std::string>(), "Code");
-    EXPECT_EQ(j["fields"][0]["meta"]["description"].get<std::string>(), "Action code");
-    EXPECT_EQ(j["fields"][1]["meta"]["name"].get<std::string>(), "Name");
+    EXPECT_EQ(j["fields"][0]["display_info"]["name"].get<std::string>(), "Code");
+    EXPECT_EQ(j["fields"][0]["display_info"]["description"].get<std::string>(), "Action code");
+    EXPECT_EQ(j["fields"][1]["display_info"]["name"].get<std::string>(), "Name");
 }
 
 TEST(StructCell, descriptor_optional_field_marks_required_false) {
@@ -456,19 +456,19 @@ TEST(StructCell, lenient_mode_to_json_emits_null_for_null_extra) {
     EXPECT_TRUE(j["v"]["ghost"].is_null());
 }
 
-TEST(StructCell, member_field_descriptor_meta_returns_builder_values) {
+TEST(StructCell, member_field_descriptor_display_info_returns_builder_values) {
     const auto d = ActionCell::descriptor();
     auto* hf = dynamic_cast<parcel::IHasFields*>(d.get());
     ASSERT_NE(hf, nullptr);
     const auto map = hf->fields();
 
-    const auto code_meta = map.at("code")->meta();
-    EXPECT_EQ(code_meta.name, "Code");
-    ASSERT_TRUE(code_meta.description.has_value());
-    EXPECT_EQ(*code_meta.description, "Action code");
+    const auto code_display_info = map.at("code")->display_info();
+    EXPECT_EQ(code_display_info.name, "Code");
+    ASSERT_TRUE(code_display_info.description.has_value());
+    EXPECT_EQ(*code_display_info.description, "Action code");
 
-    const auto name_meta = map.at("name")->meta();
-    EXPECT_EQ(name_meta.name, "Name");
+    const auto name_display_info = map.at("name")->display_info();
+    EXPECT_EQ(name_display_info.name, "Name");
 }
 
 TEST(StructCell, registry_dispatches_by_kind) {
@@ -506,7 +506,7 @@ struct Address {
 class AddressCell : public parcel::StructCell<AddressCell, Address, "address"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Address"};
     }
     [[maybe_unused]] [[maybe_unused]] static auto field_descriptors() {
@@ -537,7 +537,7 @@ struct Person {
 class PersonCell : public parcel::StructCell<PersonCell, Person, "person"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Person"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -649,7 +649,7 @@ struct Profile {
 class ProfileCell : public parcel::StructCell<ProfileCell, Profile, "profile"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Profile"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -668,7 +668,7 @@ class ProfileRequiredCell
     : public parcel::StructCell<ProfileRequiredCell, ProfileRequired, "profile_required"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "ProfileRequired"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -686,7 +686,7 @@ struct OptScores {
 class OptScoresCell : public parcel::StructCell<OptScoresCell, OptScores, "opt_scores"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "OptScores"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -874,7 +874,7 @@ class LyingStructCell : public parcel::StructCell<LyingStructCell, LyingPayload,
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "LyingStruct"};
     }
 
@@ -909,7 +909,7 @@ class StreetAddressCell
     : public parcel::StructCell<StreetAddressCell, StreetAddress, "street_address"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "StreetAddress"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -929,7 +929,7 @@ struct HomeAddress : StreetAddress {
 class HomeAddressCell : public parcel::StructCell<HomeAddressCell, HomeAddress, "home_address"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "HomeAddress"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -949,7 +949,7 @@ struct UnrelatedPayload {
 class UnrelatedCell : public parcel::StructCell<UnrelatedCell, UnrelatedPayload, "unrelated"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Unrelated"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -994,12 +994,12 @@ TEST(FieldsBuilderExtend, inherited_fields_appear_in_declaration_order) {
     EXPECT_EQ(j["fields"][2]["kind"].get<std::string>(), "string");
 }
 
-TEST(FieldsBuilderExtend, inherited_field_meta_carries_through) {
+TEST(FieldsBuilderExtend, inherited_field_display_info_carries_through) {
     const auto d = HomeAddressCell::descriptor();
     const auto j = d->to_json();
-    EXPECT_EQ(j["fields"][0]["meta"]["name"].get<std::string>(), "Street");
-    EXPECT_EQ(j["fields"][1]["meta"]["name"].get<std::string>(), "City");
-    EXPECT_EQ(j["fields"][2]["meta"]["name"].get<std::string>(), "Label");
+    EXPECT_EQ(j["fields"][0]["display_info"]["name"].get<std::string>(), "Street");
+    EXPECT_EQ(j["fields"][1]["display_info"]["name"].get<std::string>(), "City");
+    EXPECT_EQ(j["fields"][2]["display_info"]["name"].get<std::string>(), "Label");
 }
 
 TEST(FieldsBuilderExtend, round_trips_inherited_and_own_fields) {
@@ -1058,7 +1058,7 @@ class HomeAddressWithRequiredCityOverrideCell
           StructCell<HomeAddressWithRequiredCityOverrideCell, HomeAddress, "home_address_v2"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "HomeAddressV2"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -1076,7 +1076,7 @@ class HomeAddressWithoutCityCell
     : public parcel::StructCell<HomeAddressWithoutCityCell, HomeAddress, "home_address_no_city"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "HomeAddressNoCity"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -1096,7 +1096,7 @@ TEST(FieldsBuilderExtend, field_after_extend_overrides_inherited_in_place) {
     ASSERT_EQ(j["fields"].size(), 3u);
     EXPECT_EQ(j["fields"][0]["key"].get<std::string>(), "street");
     EXPECT_EQ(j["fields"][1]["key"].get<std::string>(), "city");
-    EXPECT_EQ(j["fields"][1]["meta"]["name"].get<std::string>(), "CityOverridden");
+    EXPECT_EQ(j["fields"][1]["display_info"]["name"].get<std::string>(), "CityOverridden");
     EXPECT_EQ(j["fields"][2]["key"].get<std::string>(), "label");
 }
 
@@ -1139,7 +1139,7 @@ public:
 
     [[maybe_unused]] static constexpr std::string_view kind_id = "s:my_direct";
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "MyDirect"};
     }
 
@@ -1171,7 +1171,7 @@ public:
         timestamp_ = v;
     }
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Event"};
     }
 
@@ -1202,7 +1202,7 @@ public:
     [[maybe_unused]] static constexpr std::string_view kind_id = "s:lenient_self";
     [[maybe_unused]] static constexpr bool allow_extra_fields = true;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "LenientSelf"};
     }
 
@@ -1232,7 +1232,7 @@ public:
         return hidden_label_;
     }
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "ProtectedFields"};
     }
 
@@ -1427,7 +1427,7 @@ class IconColorCell : public parcel::StructCell<IconColorCell, IconColorPayload,
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "IconColor"};
     }
 
@@ -1449,7 +1449,7 @@ class DupKeyCell : public parcel::StructCell<DupKeyCell, DupKeyPayload, "dup_key
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "DupKey"};
     }
 
@@ -1470,7 +1470,7 @@ public:
 
     [[maybe_unused]] static constexpr bool allow_extra_fields = true;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "TwinLenientAction"};
     }
 
@@ -1485,20 +1485,20 @@ public:
 
 }  // namespace
 
-TEST(FieldsBuilder, icon_sets_field_meta_icon) {
+TEST(FieldsBuilder, icon_sets_field_display_info_icon) {
     const auto d = IconColorCell::descriptor();
     const auto j = d->to_json();
     ASSERT_TRUE(j["fields"].is_array());
     ASSERT_EQ(j["fields"].size(), 1u);
     // Icon serializes as its canonical Iconify set:name string.
-    EXPECT_EQ(j["fields"][0]["meta"]["icon"].get<std::string>(), "mdi:star");
+    EXPECT_EQ(j["fields"][0]["display_info"]["icon"].get<std::string>(), "mdi:star");
 }
 
-TEST(FieldsBuilder, color_sets_field_meta_color) {
+TEST(FieldsBuilder, color_sets_field_display_info_color) {
     const auto d = IconColorCell::descriptor();
     const auto j = d->to_json();
     // The CSS name "red" parses and serializes back as its hex form.
-    EXPECT_EQ(j["fields"][0]["meta"]["color"].get<std::string>(), "#ff0000");
+    EXPECT_EQ(j["fields"][0]["display_info"]["color"].get<std::string>(), "#ff0000");
 }
 
 TEST(FieldsBuilder, description_before_field_throws) {

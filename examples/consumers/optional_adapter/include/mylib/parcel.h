@@ -17,7 +17,7 @@ class ColorCell : public parcel::StructCell<ColorCell, Color, "mylib.color"> {
 public:
     using StructCell::StructCell;
 
-    static parcel::DisplayInfo meta_info() {
+    static parcel::DisplayInfo display_info() {
         return {.name = "Color"};
     }
 

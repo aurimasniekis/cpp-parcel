@@ -53,7 +53,7 @@ public:
             {ICell::KEY_KIND, kind_id},
             {ICell::KEY_VALUE, static_cast<std::int64_t>(this->value.time_since_epoch().count())},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
@@ -61,7 +61,7 @@ public:
         const auto epoch = base_t::cell_from_json<std::int64_t>(j, kind_id);
         auto cell = std::make_shared<SystemTimePointCell>(
             std::chrono::sys_seconds{std::chrono::seconds{epoch}});
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
@@ -99,7 +99,7 @@ public:
             {ICell::KEY_KIND, kind_id},
             {ICell::KEY_VALUE, static_cast<std::int64_t>(this->value.time_since_epoch().count())},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
@@ -107,7 +107,7 @@ public:
         const auto epoch = base_t::cell_from_json<std::int64_t>(j, kind_id);
         auto cell = std::make_shared<UnixMillisCell>(
             std::chrono::sys_time<std::chrono::milliseconds>{std::chrono::milliseconds{epoch}});
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
@@ -145,14 +145,14 @@ public:
             {ICell::KEY_KIND, kind_id},
             {ICell::KEY_VALUE, static_cast<std::int64_t>(this->value.count())},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
     static cell_t from_json(json_t const& j, ParcelRegistry const&) {
         const auto v = base_t::cell_from_json<std::int64_t>(j, kind_id);
         auto cell = std::make_shared<DurationMsCell>(std::chrono::milliseconds{v});
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
@@ -186,14 +186,14 @@ public:
             {ICell::KEY_KIND, kind_id},
             {ICell::KEY_VALUE, format_iso(this->value)},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
     static cell_t from_json(json_t const& j, ParcelRegistry const&) {
         const auto s = base_t::cell_from_json<std::string>(j, kind_id);
         auto cell = std::make_shared<YmdCell>(parse_iso(s));
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 

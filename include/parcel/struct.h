@@ -92,14 +92,14 @@ struct IPayloadFieldDescriptor : virtual IFieldDescriptor {
      * @brief Three-way compare this field across two payload instances.
      *
      * `StructCell::compare` walks fields in declaration order and short-
-     * circuits on the first non-equal result; ignores meta. Optional fields
+     * circuits on the first non-equal result; ignores display info. Optional fields
      * follow `std::optional`'s `<=>`: absent < present, both absent is equal.
      */
     [[nodiscard]] virtual std::partial_ordering compare(Payload const& a,
                                                         Payload const& b) const = 0;
 
-    /** @brief Mutable access to this field's meta — used by `FieldsBuilder`. */
-    virtual DisplayInfo& mutable_meta() = 0;
+    /** @brief Mutable access to this field's display info — used by `FieldsBuilder`. */
+    virtual DisplayInfo& mutable_display_info() = 0;
 
     /** @brief Override the field's required flag. */
     virtual void set_required(bool r) = 0;
@@ -128,20 +128,20 @@ class MemberFieldDescriptor final : public IPayloadFieldDescriptor<Payload> {
     FieldT Payload::*member_ptr_;
     // clang-format on
     std::string key_;
-    DisplayInfo meta_;
+    DisplayInfo display_info_;
     bool required_ = !detail::is_optional_v<FieldT>;
 
 public:
     /**
-     * @brief Construct with the member pointer, JSON key, and (initial) metadata.
+     * @brief Construct with the member pointer, JSON key, and (initial) display info.
      * @param member_ptr Pointer-to-member into @p Payload.
      * @param key        JSON key under which this field appears.
-     * @param meta       Initial descriptive metadata.
+     * @param info       Initial display info.
      */
     // clang-format off
-    MemberFieldDescriptor(FieldT Payload::*member_ptr, std::string key, DisplayInfo meta)
+    MemberFieldDescriptor(FieldT Payload::*member_ptr, std::string key, DisplayInfo info)
         // clang-format on
-        : member_ptr_(member_ptr), key_(std::move(key)), meta_(std::move(meta)) {}
+        : member_ptr_(member_ptr), key_(std::move(key)), display_info_(std::move(info)) {}
 
     [[nodiscard]] std::string_view key() const override {
         return key_;
@@ -149,8 +149,8 @@ public:
     [[nodiscard]] std::string_view kind() const override {
         return CellT::kind_id;
     }
-    [[nodiscard]] DisplayInfo meta() const override {
-        return meta_;
+    [[nodiscard]] DisplayInfo display_info() const override {
+        return display_info_;
     }
     [[nodiscard]] bool is_required() const override {
         return required_;
@@ -160,13 +160,13 @@ public:
         return json_t{
             {"key", key_},
             {"kind", CellT::kind_id},
-            {"meta", json_t(meta_)},
+            {"display_info", json_t(display_info_)},
             {"required", required_},
         };
     }
 
-    DisplayInfo& mutable_meta() override {
-        return meta_;
+    DisplayInfo& mutable_display_info() override {
+        return display_info_;
     }
     void set_required(const bool r) override {
         required_ = r;
@@ -271,8 +271,8 @@ public:
     [[nodiscard]] std::string_view kind() const override {
         return inner_->kind();
     }
-    [[nodiscard]] DisplayInfo meta() const override {
-        return inner_->meta();
+    [[nodiscard]] DisplayInfo display_info() const override {
+        return inner_->display_info();
     }
     [[nodiscard]] bool is_required() const override {
         return inner_->is_required();
@@ -281,8 +281,8 @@ public:
         return inner_->to_json();
     }
 
-    DisplayInfo& mutable_meta() override {
-        return inner_->mutable_meta();
+    DisplayInfo& mutable_display_info() override {
+        return inner_->mutable_display_info();
     }
     void set_required(const bool r) override {
         inner_->set_required(r);
@@ -394,41 +394,41 @@ public:
     }
 
     /**
-     * @brief Set the `name` meta of the most recently declared field.
+     * @brief Set the `name` display info of the most recently declared field.
      * @param v Display name.
      * @return `*this` for chaining.
      * @throws std::runtime_error if called before any `field<>()`.
      */
     FieldsBuilder& name(std::string v) {
-        require_last("name")->mutable_meta().name = std::move(v);
+        require_last("name")->mutable_display_info().name = std::move(v);
         return *this;
     }
 
     /**
-     * @brief Set the `description` meta of the most recently declared field.
+     * @brief Set the `description` display info of the most recently declared field.
      * @param v Description text.
      * @return `*this` for chaining.
      * @throws std::runtime_error if called before any `field<>()`.
      */
     FieldsBuilder& description(std::string v) {
-        require_last("description")->mutable_meta().description = std::move(v);
+        require_last("description")->mutable_display_info().description = std::move(v);
         return *this;
     }
 
     /**
-     * @brief Set the `icon` meta of the most recently declared field to the
+     * @brief Set the `icon` display info of the most recently declared field to the
      *        typed @p icon.
      * @param icon Icon value.
      * @return `*this` for chaining.
      * @throws std::runtime_error if called before any `field<>()`.
      */
     FieldsBuilder& icon(comms::Icon icon) {
-        require_last("icon")->mutable_meta().icon = icon;
+        require_last("icon")->mutable_display_info().icon = icon;
         return *this;
     }
 
     /**
-     * @brief Set the `icon` meta of the most recently declared field, parsing
+     * @brief Set the `icon` display info of the most recently declared field, parsing
      *        an Iconify `set:name` string (e.g. `"mdi:account"`).
      * @param v Iconify `set:name` identifier.
      * @return `*this` for chaining.
@@ -440,19 +440,19 @@ public:
     }
 
     /**
-     * @brief Set the `color` meta of the most recently declared field to the
+     * @brief Set the `color` display info of the most recently declared field to the
      *        typed @p color.
      * @param color Color value.
      * @return `*this` for chaining.
      * @throws std::runtime_error if called before any `field<>()`.
      */
     FieldsBuilder& color(comms::Color color) {
-        require_last("color")->mutable_meta().color = color;
+        require_last("color")->mutable_display_info().color = color;
         return *this;
     }
 
     /**
-     * @brief Set the `color` meta of the most recently declared field, parsing
+     * @brief Set the `color` display info of the most recently declared field, parsing
      *        a color string (hex, CSS-functional, or a CSS color name).
      * @param v Color string accepted by `comms::Color::parse`.
      * @return `*this` for chaining.
@@ -592,12 +592,12 @@ public:
         typename FieldsBuilder<Payload>::payload_field_descriptors_t;
 
     /**
-     * @brief Construct with descriptive metadata and the field descriptor list.
-     * @param meta   Cell-level descriptive metadata.
+     * @brief Construct with display info and the field descriptor list.
+     * @param info   Cell-level display info.
      * @param fields Field descriptor list (typically built via `FieldsBuilder`).
      */
-    StructCellTypeDescriptor(DisplayInfo meta, payload_field_descriptors_t fields)
-        : base_t(std::move(meta)), fields_(std::move(fields)) {}
+    StructCellTypeDescriptor(DisplayInfo info, payload_field_descriptors_t fields)
+        : base_t(std::move(info)), fields_(std::move(fields)) {}
 
     [[nodiscard]] descriptor::CellCategory category() const override {
         return descriptor::CellCategory::Struct;
@@ -662,7 +662,7 @@ private:
  *
  * The concrete `Derived` must additionally provide:
  *   - `static auto field_descriptors()`             — built via `FieldsBuilder<Payload>`.
- *   - (optional) `static DisplayInfo meta_info()` — cell-level meta;
+ *   - (optional) `static DisplayInfo display_info()` — cell-level display info;
  *     defaults to an empty `DisplayInfo{}` when not declared.
  *   - (optional) `static constexpr bool allow_extra_fields` — defaults to false.
  *
@@ -712,13 +712,13 @@ public:
     static constexpr std::string_view kind_id = id_join_lit_v<"s:", StructId>;
 
     /**
-     * @brief Default cell-level meta (empty).
+     * @brief Default cell-level display info (empty).
      *
      * Concrete `Derived` types may shadow this with their own
-     * `static DisplayInfo meta_info()` (e.g. to set a display
+     * `static DisplayInfo display_info()` (e.g. to set a display
      * name); when omitted, an empty `DisplayInfo{}` is used.
      */
-    static DisplayInfo meta_info() {
+    static DisplayInfo display_info() {
         return {};
     }
 
@@ -764,7 +764,7 @@ public:
             {ICell::KEY_KIND, Derived::kind_id},
             {ICell::KEY_VALUE, std::move(v_obj)},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
@@ -781,7 +781,7 @@ public:
 
     /**
      * @brief Three-way comparison over field values (and `extras` when
-     *        `allow_extra_fields` is true); ignores meta.
+     *        `allow_extra_fields` is true); ignores display info.
      *
      * Walks declared fields in the order returned by `field_descriptors()`,
      * delegating each comparison to the field descriptor's typed
@@ -911,7 +911,7 @@ public:
             }
         }
 
-        base_t::absorb_meta(j, out);
+        base_t::absorb_display_info(j, out);
         return out;
     }
 
@@ -921,7 +921,7 @@ public:
      */
     static cell_type_descriptor_t descriptor() {
         static const auto d = std::make_shared<StructCellTypeDescriptor<Derived, Payload>>(
-            Derived::meta_info(), Derived::field_descriptors());
+            Derived::display_info(), Derived::field_descriptors());
         return d;
     }
 };
@@ -969,7 +969,7 @@ public:
  * `Derived` must additionally provide:
  *   - `static constexpr std::string_view kind_id` — wire kind id.
  *   - `static auto field_descriptors()`           — built via `FieldsBuilder<Derived>`.
- *   - (optional) `static DisplayInfo meta_info()` — cell-level meta;
+ *   - (optional) `static DisplayInfo display_info()` — cell-level display info;
  *     defaults to an empty `DisplayInfo{}` when not declared.
  *   - (optional) `static constexpr bool allow_extra_fields` — defaults to false.
  *
@@ -1048,7 +1048,7 @@ public:
             {ICell::KEY_KIND, Derived::kind_id},
             {ICell::KEY_VALUE, std::move(v_obj)},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
@@ -1065,7 +1065,7 @@ public:
 
     /**
      * @brief Three-way comparison over field values (and `cell_extras_` when
-     *        `allow_extra_fields` is true); ignores meta.
+     *        `allow_extra_fields` is true); ignores display info.
      *
      * Walks declared fields in the order returned by `field_descriptors()`
      * and short-circuits on the first non-equal result. Optional fields
@@ -1194,7 +1194,7 @@ public:
         }
 
         if (const auto it_d = j.find(ICell::KEY_DESCRIPTION); it_d != j.end()) {
-            out->meta_ = it_d->get<DisplayInfo>();
+            out->display_info_ = it_d->get<DisplayInfo>();
         }
         return out;
     }
@@ -1205,35 +1205,35 @@ public:
      */
     static cell_type_descriptor_t descriptor() {
         static const auto d = std::make_shared<StructCellTypeDescriptor<Derived, Derived>>(
-            Derived::meta_info(), Derived::field_descriptors());
+            Derived::display_info(), Derived::field_descriptors());
         return d;
     }
 
-    [[nodiscard]] std::optional<DisplayInfo> const& meta() const override {
-        return meta_;
+    [[nodiscard]] std::optional<DisplayInfo> const& overridden_display_info() const override {
+        return display_info_;
     }
 
 protected:
     /**
-     * @brief Copy this cell's meta (if any) into the JSON object under `"d"`.
+     * @brief Copy this cell's display info (if any) into the JSON object under `"d"`.
      *
-     * Mirrors `BaseCell::inject_meta` — re-declared here because
+     * Mirrors `BaseCell::inject_display_info` — re-declared here because
      * `SelfStructCell` inherits `ICell` directly, not `BaseCell`.
      *
      * @param j JSON object to mutate.
      */
-    void inject_meta(json_t& j) const {
-        if (meta_) {
-            j[ICell::KEY_DESCRIPTION] = *meta_;
+    void inject_display_info(json_t& j) const {
+        if (display_info_) {
+            j[ICell::KEY_DESCRIPTION] = *display_info_;
         }
     }
 
-    void set_meta(std::optional<DisplayInfo> m) override {
-        meta_ = std::move(m);
+    void set_display_info(std::optional<DisplayInfo> m) override {
+        display_info_ = std::move(m);
     }
 
-    /** @brief Optional descriptive metadata; omitted from JSON when empty. */
-    std::optional<DisplayInfo> meta_;
+    /** @brief Optional display info; omitted from JSON when empty. */
+    std::optional<DisplayInfo> display_info_;
 
     /** @brief Unknown keys retained when `Derived::allow_extra_fields` is true. */
     std::map<std::string, cell_t> cell_extras_;

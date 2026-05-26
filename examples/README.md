@@ -15,7 +15,7 @@ make build && ./build/examples/<target>
 | `parcel_struct_extras_demo`      | `struct_extras_demo.cpp`      | `allow_extra_fields = true` capturing unknown keys into `extras`; clone/re-emit preservation.                       | `StructCell::extras`, `allow_extra_fields`                                                                           |
 | `parcel_union_demo`              | `union_demo.cpp`              | `UnionCell<Ts...>`; `index()`, `active_kind()`, `get<I>()`, `get<S>()`; round-trip.                                 | `UnionCell`                                                                                                          |
 | `parcel_registry_demo`           | `registry_demo.cpp`           | Register kinds; polymorphic dispatch via `cell_from_json`; `find_by_*`; `define()` graph.                           | `ParcelRegistry`, `Definition`                                                                                       |
-| `parcel_meta_demo`               | `meta_demo.cpp`               | Immutable `with_*` builders; `DisplayInfo` round-trip via the `"d"` wire block.                                     | `ICell::with_meta` / `with_name` / `with_description` / `with_icon` / `with_color`                                   |
+| `parcel_display_info_demo`       | `display_info_demo.cpp`       | Immutable `with_*` builders; `DisplayInfo` round-trip via the `"d"` wire block.                                     | `ICell::with_display_info` / `with_name` / `with_description` / `with_icon` / `with_color`                                   |
 | `parcel_commons_demo`            | `commons_demo.cpp`            | The commons vocabulary cells: `ColorCell`, `IconCell`, `DisplayInfoCell`, `FlagCell`, `FlagSetCell`; round-trip.    | `ColorCell`, `IconCell`, `DisplayInfoCell`, `FlagCell`, `FlagSetCell`, `comms::*`, `COMMONS_DEFINE_FLAG`             |
 | `parcel_error_handling_demo`     | `error_handling_demo.cpp`     | Every documented `runtime_error` path: missing/wrong `k`                                                            | strictness contract across every cell category                                                                       |
 | `parcel_defaults_demo`           | `defaults_demo.cpp`           | `default_cell_for<T>` field-type inference for primitives, optional, vector, map, variant.                          | `default_cell_for`, `default_cell_for_t`, inferred `FieldsBuilder::field<>`                                          |
@@ -46,7 +46,7 @@ builds on the concepts of the previous:
 4. `parcel_struct_demo` — modelling your own data.
 5. `parcel_union_demo` — closed-set polymorphism.
 6. `parcel_registry_demo` — how the wire becomes a cell.
-7. `parcel_meta_demo` — annotating cells without mutating them.
+7. `parcel_display_info_demo` — annotating cells without mutating them.
 8. `parcel_error_handling_demo` — what failure looks like.
 9. `parcel_defaults_demo` — letting `FieldsBuilder` infer cell types.
 10. `parcel_custom_primitive_demo` — extending parcel with your own primitive.

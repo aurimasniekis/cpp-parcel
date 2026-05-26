@@ -63,12 +63,12 @@ using comms::i128;
 using comms::FixedString;
 
 /**
- * @brief Descriptive metadata attached to a cell or descriptor — re-exported
+ * @brief Display info attached to a cell or descriptor — re-exported
  *        from `comms::DisplayInfo`.
  *
  * Every `ICell` may carry an optional `DisplayInfo` (name / description / typed
  * `comms::Icon` / typed `comms::Color`), serialized under the JSON key `"d"`.
- * It is purely descriptive metadata for UI/tooling use and never affects the
+ * It is purely display info for UI/tooling use and never affects the
  * wire identity (`"k"`) or value (`"v"`) of a cell. It serializes via commons'
  * free ADL `to_json` / `from_json` (there is no member `to_json()`).
  */
@@ -90,7 +90,7 @@ using DisplayInfo = comms::DisplayInfo;
 template <std::string_view const&... Parts>
 struct id_join {
     static constexpr std::size_t total_size = (Parts.size() + ... + 0);
-    static constexpr auto buf = []() {
+    static constexpr auto buf = [] {
         std::array<char, total_size> r{};
         std::size_t off = 0;
         ((std::ranges::copy(Parts, r.begin() + off), off += Parts.size()), ...);
@@ -126,7 +126,7 @@ inline constexpr std::string_view id_join_v = id_join<Parts...>::value;
 template <FixedString... Parts>
 struct id_join_lit {
     static constexpr std::size_t total_size = (Parts.view().size() + ... + 0);
-    static constexpr auto buf = []() {
+    static constexpr auto buf = [] {
         std::array<char, total_size> r{};
         std::size_t off = 0;
         ((std::ranges::copy(Parts.view(), r.begin() + off), off += Parts.view().size()), ...);
@@ -161,7 +161,7 @@ inline constexpr std::string_view id_join_lit_v = id_join_lit<Parts...>::value;
 template <FixedString Prefix, std::string_view const& Tail>
 struct prefixed_id {
     static constexpr std::size_t total_size = Prefix.view().size() + Tail.size();
-    static constexpr auto buf = []() {
+    static constexpr auto buf = [] {
         std::array<char, total_size> r{};
         std::ranges::copy(Prefix.view(), r.begin());
         std::ranges::copy(Tail, r.begin() + Prefix.view().size());

@@ -70,13 +70,13 @@ using cell_t = std::shared_ptr<ICell>;
 /**
  * @brief Polymorphic root of every parcel cell.
  *
- * Wire shape: `{"k": <kind>, "v": <value>, "d": <meta>}` where the `"d"`
- * block is omitted when no meta is set. Every concrete cell exposes its
+ * Wire shape: `{"k": <kind>, "v": <value>, "d": <display info>}` where the `"d"`
+ * block is omitted when no display info is set. Every concrete cell exposes its
  * kind via `kind()`, can serialize through `to_json()`, render via
  * `to_string()`, and clone deeply via `clone()`.
  *
- * Meta is read-only on the public surface: callers retrieve it via
- * `meta()` and only the immutable `with_*` builders may change it.
+ * Display info is read-only on the public surface: callers retrieve it via
+ * `overridden_display_info()` and only the immutable `with_*` builders may change it.
  *
  * @see BaseCell — CRTP base providing default implementations.
  * @see CellLike — concept naming the static side of a cell type.
@@ -86,7 +86,7 @@ struct ICell {
     static constexpr std::string_view KEY_KIND = "k";
     /** @brief JSON key for the value payload (`"v"`). */
     static constexpr std::string_view KEY_VALUE = "v";
-    /** @brief JSON key for the optional meta block (`"d"`). */
+    /** @brief JSON key for the optional display info block (`"d"`). */
     static constexpr std::string_view KEY_DESCRIPTION = "d";
 
     virtual ~ICell() = default;
@@ -98,10 +98,10 @@ struct ICell {
     [[nodiscard]] virtual std::string_view kind() const = 0;
 
     /**
-     * @brief Read-only access to this cell's optional descriptive metadata.
-     * @return Reference to the held optional; empty when no meta is set.
+     * @brief Read-only access to this cell's optional display info.
+     * @return Reference to the held optional; empty when no display info is set.
      */
-    [[nodiscard]] virtual std::optional<DisplayInfo> const& meta() const = 0;
+    [[nodiscard]] virtual std::optional<DisplayInfo> const& overridden_display_info() const = 0;
 
     /**
      * @brief Serialize this cell to its canonical JSON representation.
@@ -133,7 +133,7 @@ struct ICell {
      * @brief Three-way compare against another cell.
      *
      * Compares by kind id first (lexicographic on the string view); within
-     * the same kind, compares the held value. Metadata is intentionally
+     * the same kind, compares the held value. Display info is intentionally
      * ignored — two cells with the same kind/value but different `DisplayInfo`
      * are equivalent under this relation.
      *
@@ -145,14 +145,14 @@ struct ICell {
     [[nodiscard]] virtual std::partial_ordering compare(ICell const& other) const = 0;
 
     /**
-     * @brief Equality-consistent hash that mirrors `compare`'s meta-insensitivity.
+     * @brief Equality-consistent hash that mirrors `compare`'s display-info-insensitivity.
      *
      * Default implementation hashes the kind id and the JSON dump of `"v"`,
      * which works for every cell whose `to_json()` payload omits nested
      * `DisplayInfo`. Heterogeneous container cells (`ListCell`, `MapCell`,
      * `HashMapCell`) override this to recurse through `hash_value()` on
-     * their children — that is what keeps the hash meta-insensitive when
-     * children carry meta of their own.
+     * their children — that is what keeps the hash display-info-insensitive when
+     * children carry display info of their own.
      */
     [[nodiscard]] virtual std::size_t hash_value() const noexcept {
         const std::size_t hk = std::hash<std::string_view>{}(this->kind());
@@ -167,65 +167,65 @@ struct ICell {
         }
     }
 
-    /** @brief Equality through `compare`; ignores meta. */
+    /** @brief Equality through `compare`; ignores display info. */
     friend bool operator==(ICell const& a, ICell const& b) {
         return a.compare(b) == std::partial_ordering::equivalent;
     }
 
-    /** @brief Three-way comparison through `compare`; ignores meta. */
+    /** @brief Three-way comparison through `compare`; ignores display info. */
     friend std::partial_ordering operator<=>(ICell const& a, ICell const& b) {
         return a.compare(b);
     }
 
-    // Immutable builders: each clones the cell, mutates the clone's meta,
+    // Immutable builders: each clones the cell, mutates the clone's display info,
     // and returns the new cell_t. The original is untouched.
 
     /**
-     * @brief Return a deep copy with the entire meta block replaced.
-     * @param m New meta to attach.
+     * @brief Return a deep copy with the entire display info block replaced.
+     * @param m New display info to attach.
      * @return Fresh `cell_t`; this cell is unmodified.
      */
-    [[nodiscard]] cell_t with_meta(DisplayInfo m) const {
+    [[nodiscard]] cell_t with_display_info(DisplayInfo m) const {
         auto c = clone();
-        c->set_meta(std::move(m));
+        c->set_display_info(std::move(m));
         return c;
     }
 
     /**
-     * @brief Return a deep copy with `meta.name` set to @p v.
+     * @brief Return a deep copy with `name` set to @p v.
      * @param v New name.
      * @return Fresh `cell_t`; this cell is unmodified.
      */
     [[nodiscard]] cell_t with_name(std::string v) const {
-        auto m = meta().value_or(DisplayInfo{});
+        auto m = overridden_display_info().value_or(DisplayInfo{});
         m.name = std::move(v);
-        return with_meta(std::move(m));
+        return with_display_info(std::move(m));
     }
 
     /**
-     * @brief Return a deep copy with `meta.description` set to @p v.
+     * @brief Return a deep copy with `description` set to @p v.
      * @param v New description.
      * @return Fresh `cell_t`; this cell is unmodified.
      */
     [[nodiscard]] cell_t with_description(std::string v) const {
-        auto m = meta().value_or(DisplayInfo{});
+        auto m = overridden_display_info().value_or(DisplayInfo{});
         m.description = std::move(v);
-        return with_meta(std::move(m));
+        return with_display_info(std::move(m));
     }
 
     /**
-     * @brief Return a deep copy with `meta.icon` set to the typed @p icon.
+     * @brief Return a deep copy with `icon` set to the typed @p icon.
      * @param icon New icon.
      * @return Fresh `cell_t`; this cell is unmodified.
      */
     [[nodiscard]] cell_t with_icon(comms::Icon icon) const {
-        auto m = meta().value_or(DisplayInfo{});
+        auto m = overridden_display_info().value_or(DisplayInfo{});
         m.icon = icon;
-        return with_meta(std::move(m));
+        return with_display_info(std::move(m));
     }
 
     /**
-     * @brief Return a deep copy with `meta.icon` parsed from an Iconify
+     * @brief Return a deep copy with `icon` parsed from an Iconify
      *        `set:name` string (e.g. `"mdi:account"`).
      * @param v Iconify `set:name` identifier.
      * @return Fresh `cell_t`; this cell is unmodified.
@@ -236,18 +236,18 @@ struct ICell {
     }
 
     /**
-     * @brief Return a deep copy with `meta.color` set to the typed @p color.
+     * @brief Return a deep copy with `color` set to the typed @p color.
      * @param color New color.
      * @return Fresh `cell_t`; this cell is unmodified.
      */
     [[nodiscard]] cell_t with_color(comms::Color color) const {
-        auto m = meta().value_or(DisplayInfo{});
+        auto m = overridden_display_info().value_or(DisplayInfo{});
         m.color = color;
-        return with_meta(std::move(m));
+        return with_display_info(std::move(m));
     }
 
     /**
-     * @brief Return a deep copy with `meta.color` parsed from a color string
+     * @brief Return a deep copy with `color` parsed from a color string
      *        (hex like `"#ffcc00"`, a CSS-functional form, or a CSS color name).
      * @param v Color string accepted by `comms::Color::parse`.
      * @return Fresh `cell_t`; this cell is unmodified.
@@ -263,12 +263,12 @@ struct ICell {
 
 protected:
     /**
-     * @brief Replace this cell's meta in place. Used by `with_*` builders
+     * @brief Replace this cell's display info in place. Used by `with_*` builders
      *        on freshly cloned receivers and by JSON deserializers; no
-     *        other public path mutates meta.
-     * @param m New meta value (may be empty to clear).
+     *        other public path mutates display info.
+     * @param m New display info value (may be empty to clear).
      */
-    virtual void set_meta(std::optional<DisplayInfo> m) = 0;
+    virtual void set_display_info(std::optional<DisplayInfo> m) = 0;
 
     template <typename, typename>
     friend struct BaseCell;
@@ -412,8 +412,8 @@ struct BaseCell : ICell {
         return Derived::kind_id;
     }
 
-    [[nodiscard]] std::optional<DisplayInfo> const& meta() const override {
-        return meta_;
+    [[nodiscard]] std::optional<DisplayInfo> const& overridden_display_info() const override {
+        return display_info_;
     }
 
     [[nodiscard]] cell_t clone() const override {
@@ -430,7 +430,7 @@ struct BaseCell : ICell {
      * storage (which `UnionCell` overrides), return `unordered`.
      *
      * @param other Cell to compare with.
-     * @return Three-way comparison result; ignores meta.
+     * @return Three-way comparison result; ignores display info.
      */
     [[nodiscard]] std::partial_ordering compare(ICell const& other) const override {
         if (const auto k_cmp = this->kind() <=> other.kind(); k_cmp != 0) {
@@ -461,7 +461,7 @@ struct BaseCell : ICell {
      * @brief Default JSON serialization for cells with JSON-convertible storage.
      *
      * If `Storage` has a JSON adapter, emits `{"k": kind_id, "v": value,
-     * optional "d": meta}`. Otherwise the call throws — the derived cell
+     * optional "d": display info}`. Otherwise the call throws — the derived cell
      * must override `to_json` itself (`ListCell`, `MapCell`, etc.).
      *
      * @return JSON object representation.
@@ -470,7 +470,7 @@ struct BaseCell : ICell {
     [[nodiscard]] json_t to_json() const override {
         if constexpr (requires(Storage const& s) { json_t(s); }) {
             json_t j{{KEY_KIND, kind()}, {KEY_VALUE, this->value}};
-            inject_meta(j);
+            inject_display_info(j);
             return j;
         } else {
             throw std::runtime_error(
@@ -480,12 +480,12 @@ struct BaseCell : ICell {
     }
 
     /**
-     * @brief Copy this cell's meta (if any) into the JSON object under `"d"`.
+     * @brief Copy this cell's display info (if any) into the JSON object under `"d"`.
      * @param j JSON object to mutate.
      */
-    void inject_meta(json_t& j) const {
-        if (meta_) {
-            j[KEY_DESCRIPTION] = *meta_;
+    void inject_display_info(json_t& j) const {
+        if (display_info_) {
+            j[KEY_DESCRIPTION] = *display_info_;
         }
     }
 
@@ -493,21 +493,21 @@ struct BaseCell : ICell {
      * @brief Read `"d"` (if present) from a JSON object and assign it onto a cell.
      * @tparam Out Any pointer-like type whose pointee derives from `ICell`.
      * @param  j   Input JSON object.
-     * @param  out Pointer-like to a cell whose meta should be populated.
+     * @param  out Pointer-like to a cell whose display info should be populated.
      */
     template <typename Out>
-    static void absorb_meta(json_t const& j, Out& out) {
+    static void absorb_display_info(json_t const& j, Out& out) {
         if (const auto it = j.find(KEY_DESCRIPTION); it != j.end()) {
-            out->set_meta(it->get<DisplayInfo>());
+            out->set_display_info(it->get<DisplayInfo>());
         }
     }
 
 protected:
-    /** @brief Optional descriptive metadata; omitted from JSON when empty. */
-    std::optional<DisplayInfo> meta_;
+    /** @brief Optional display info; omitted from JSON when empty. */
+    std::optional<DisplayInfo> display_info_;
 
-    void set_meta(std::optional<DisplayInfo> m) override {
-        meta_ = std::move(m);
+    void set_display_info(std::optional<DisplayInfo> m) override {
+        display_info_ = std::move(m);
     }
 
     /**
@@ -554,11 +554,11 @@ protected:
 public:
     /**
      * @brief Strict shorthand for the recurring `cell_from_json + make_shared
-     *        + absorb_meta` pattern in concrete `from_json` overloads.
+     *        + absorb_display_info` pattern in concrete `from_json` overloads.
      *
      * Validates that @p j is an object whose `"k"` matches `Derived::kind_id`,
      * deserializes `"v"` as `Storage`, builds a `shared_ptr<Derived>` from
-     * it, and absorbs any meta block.
+     * it, and absorbs any display info block.
      *
      * Requires `Storage` to be JSON-deserializable (every primitive cell
      * already is) — concrete cells whose payload needs custom decoding (e.g.
@@ -571,7 +571,7 @@ public:
     static cell_t from_json_strict(json_t const& j) {
         auto v = cell_from_json<Storage>(j, Derived::kind_id);
         auto cell = std::make_shared<Derived>(std::move(v));
-        absorb_meta(j, cell);
+        absorb_display_info(j, cell);
         return cell;
     }
 };
@@ -728,7 +728,7 @@ namespace std {
  *
  * Routes to `ICell::hash_value`. Container cells recurse through their
  * children's `hash_value` so two cells that compare equal under
- * meta-insensitive equality also hash equal, even when nested cells differ
+ * display-info-insensitive equality also hash equal, even when nested cells differ
  * in their `DisplayInfo`.
  */
 template <>

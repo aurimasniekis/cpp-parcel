@@ -8,7 +8,7 @@ add_executable(parcel_tests
     test_struct.cpp
     test_union.cpp
     test_registry.cpp
-    test_meta.cpp
+    test_display_info.cpp
     test_compare.cpp
     test_cell_helpers.cpp
     test_ergonomics.cpp

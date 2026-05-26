@@ -42,14 +42,14 @@ public:
             {ICell::KEY_KIND, kind_id},
             {ICell::KEY_VALUE, this->value.generic_string()},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
     static cell_t from_json(json_t const& j, ParcelRegistry const&) {
         const auto s = base_t::cell_from_json<std::string>(j, kind_id);
         auto cell = std::make_shared<PathCell>(std::filesystem::path{s});
-        base_t::absorb_meta(j, cell);
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 

@@ -33,7 +33,7 @@ struct WalkPayload {
 class WalkPayloadCell : public parcel::StructCell<WalkPayloadCell, WalkPayload, "walk_payload"> {
 public:
     using StructCell::StructCell;
-    static parcel::DisplayInfo meta_info() {
+    static parcel::DisplayInfo display_info() {
         return {.name = "WalkPayload"};
     }
     static auto field_descriptors() {
@@ -601,7 +601,7 @@ TEST(HashMap, hetero_equality_is_order_independent) {
     EXPECT_EQ(a, b);
 }
 
-TEST(HashMap, hetero_clone_preserves_meta_and_deep_copies) {
+TEST(HashMap, hetero_clone_preserves_display_info_and_deep_copies) {
     parcel::HashMapCell src{
         {"x", parcel::cell(1)},
     };
@@ -609,8 +609,8 @@ TEST(HashMap, hetero_clone_preserves_meta_and_deep_copies) {
     auto cloned = with_name->clone();
     auto* typed = dynamic_cast<parcel::HashMapCell*>(cloned.get());
     ASSERT_NE(typed, nullptr);
-    ASSERT_TRUE(typed->meta().has_value());
-    EXPECT_EQ(typed->meta()->name, "annotated");
+    ASSERT_TRUE(typed->overridden_display_info().has_value());
+    EXPECT_EQ(typed->overridden_display_info()->name, "annotated");
 
     // Mutating the clone leaves the original intact.
     (*typed)["x"] = parcel::cell(999);
@@ -661,7 +661,7 @@ struct PathPayload {
 class PathPayloadCell : public parcel::StructCell<PathPayloadCell, PathPayload, "path_payload"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "PathPayload"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -679,7 +679,7 @@ class TimestampPayloadCell
     : public parcel::StructCell<TimestampPayloadCell, TimestampPayload, "ts_payload"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "TimestampPayload"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -797,32 +797,32 @@ TEST(YmdCell, to_string_matches_iso_format) {
     EXPECT_EQ(c.to_string(), "2026-04-27");
 }
 
-TEST(SystemTimePointCell, descriptor_returns_non_null_with_meta) {
+TEST(SystemTimePointCell, descriptor_returns_non_null_with_display_info) {
     const auto d = parcel::SystemTimePointCell::descriptor();
     ASSERT_NE(d, nullptr);
     EXPECT_EQ(d->kind(), parcel::SystemTimePointCell::kind_id);
-    EXPECT_EQ(d->meta().name, "SystemTimePoint");
+    EXPECT_EQ(d->display_info().name, "SystemTimePoint");
 }
 
-TEST(UnixMillisCell, descriptor_returns_non_null_with_meta) {
+TEST(UnixMillisCell, descriptor_returns_non_null_with_display_info) {
     const auto d = parcel::UnixMillisCell::descriptor();
     ASSERT_NE(d, nullptr);
     EXPECT_EQ(d->kind(), parcel::UnixMillisCell::kind_id);
-    EXPECT_EQ(d->meta().name, "UnixMillis");
+    EXPECT_EQ(d->display_info().name, "UnixMillis");
 }
 
-TEST(DurationMsCell, descriptor_returns_non_null_with_meta) {
+TEST(DurationMsCell, descriptor_returns_non_null_with_display_info) {
     const auto d = parcel::DurationMsCell::descriptor();
     ASSERT_NE(d, nullptr);
     EXPECT_EQ(d->kind(), parcel::DurationMsCell::kind_id);
-    EXPECT_EQ(d->meta().name, "DurationMs");
+    EXPECT_EQ(d->display_info().name, "DurationMs");
 }
 
-TEST(YmdCell, descriptor_returns_non_null_with_meta) {
+TEST(YmdCell, descriptor_returns_non_null_with_display_info) {
     const auto d = parcel::YmdCell::descriptor();
     ASSERT_NE(d, nullptr);
     EXPECT_EQ(d->kind(), parcel::YmdCell::kind_id);
-    EXPECT_EQ(d->meta().name, "YearMonthDay");
+    EXPECT_EQ(d->display_info().name, "YearMonthDay");
 }
 
 TEST(SystemTimePointCell, from_json_throws_on_kind_mismatch) {
@@ -907,11 +907,11 @@ TEST(PathCell, from_json_throws_on_kind_mismatch) {
     EXPECT_THROW({ (void)parcel::PathCell::from_json(j, registry()); }, std::runtime_error);
 }
 
-TEST(PathCell, descriptor_returns_non_null_with_meta) {
+TEST(PathCell, descriptor_returns_non_null_with_display_info) {
     const auto d = parcel::PathCell::descriptor();
     ASSERT_NE(d, nullptr);
     EXPECT_EQ(d->kind(), parcel::PathCell::kind_id);
-    EXPECT_EQ(d->meta().name, "Path");
+    EXPECT_EQ(d->display_info().name, "Path");
 }
 
 // ---------------------------------------------------------------------------
@@ -1038,9 +1038,9 @@ TEST(HashMapCell, compare_orders_left_value_above_right_null) {
     EXPECT_TRUE(a.compare(b) > 0);
 }
 
-TEST(HashMapCell, descriptor_returns_non_null_with_meta) {
+TEST(HashMapCell, descriptor_returns_non_null_with_display_info) {
     const auto d = parcel::HashMapCell::descriptor();
     ASSERT_NE(d, nullptr);
     EXPECT_EQ(d->kind(), parcel::HashMapCell::kind_id);
-    EXPECT_EQ(d->meta().name, "HashMap");
+    EXPECT_EQ(d->display_info().name, "HashMap");
 }

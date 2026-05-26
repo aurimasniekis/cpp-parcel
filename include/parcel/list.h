@@ -57,10 +57,10 @@ public:
     using base_t = BaseCellTypeDescriptor<TypedListCell<T>>;
 
     /**
-     * @brief Construct with the given descriptive metadata.
-     * @param meta Descriptive metadata.
+     * @brief Construct with the given display info.
+     * @param info Display info.
      */
-    explicit TypedListCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
+    explicit TypedListCellTypeDescriptor(DisplayInfo info) : base_t(std::move(info)) {}
 
     /** @brief Wire kind id of the list's element type. */
     [[nodiscard]] std::string_view element_kind() const {
@@ -104,7 +104,7 @@ public:
  */
 template <CellLike T>
 class TypedListCell : public BaseCell<TypedListCell<T>, std::vector<typename T::storage_t>> {
-    using base_t = BaseCell<TypedListCell<T>, std::vector<typename T::storage_t>>;
+    using base_t = BaseCell<TypedListCell, std::vector<typename T::storage_t>>;
 
 public:
     using element_type = T;
@@ -295,12 +295,12 @@ public:
             {ICell::KEY_KIND, kind_id},
             {ICell::KEY_VALUE, std::move(arr)},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
     /**
-     * @brief Element-wise three-way comparison; ignores meta.
+     * @brief Element-wise three-way comparison; ignores display info.
      *
      * Each element pair is wrapped in `T` and routed through `T::compare`
      * so element types whose raw storage lacks `==` (e.g. struct payloads)
@@ -373,8 +373,8 @@ public:
             }
             elems.push_back(std::move(typed->value));
         }
-        auto cell = std::make_shared<TypedListCell<T>>(std::move(elems));
-        base_t::absorb_meta(j, cell);
+        auto cell = std::make_shared<TypedListCell>(std::move(elems));
+        base_t::absorb_display_info(j, cell);
         return cell;
     }
 
@@ -406,7 +406,7 @@ public:
  * @see TypedListCell — homogeneous variant with element-tagged kind id.
  */
 class ListCell : public BaseCell<ListCell, std::vector<cell_t>> {
-    using base_t = BaseCell<ListCell, std::vector<cell_t>>;
+    using base_t = BaseCell;
 
 public:
     using base_t::base_t;
@@ -416,7 +416,7 @@ public:
      * @brief Construct from a brace-enclosed list of cells.
      * @param elems Initializer list of cell handles.
      */
-    ListCell(const std::initializer_list<cell_t> elems) : base_t(std::vector<cell_t>(elems)) {}
+    ListCell(const std::initializer_list<cell_t> elems) : base_t(std::vector(elems)) {}
 
     // ---- std::vector pass-through API ------------------------------------
 
@@ -539,10 +539,10 @@ public:
             arr.push_back(el ? el->to_json() : json_t());
         }
         json_t j{
-            {ICell::KEY_KIND, kind_id},
-            {ICell::KEY_VALUE, std::move(arr)},
+            {KEY_KIND, kind_id},
+            {KEY_VALUE, std::move(arr)},
         };
-        this->inject_meta(j);
+        this->inject_display_info(j);
         return j;
     }
 
@@ -553,7 +553,7 @@ public:
             copied.push_back(el ? el->clone() : nullptr);
         }
         auto out = std::make_shared<ListCell>(std::move(copied));
-        out->meta_ = this->meta_;
+        out->display_info_ = this->display_info_;
         return out;
     }
 
@@ -567,7 +567,7 @@ public:
     }
 
     /**
-     * @brief Lexicographic three-way comparison over elements; ignores meta.
+     * @brief Lexicographic three-way comparison over elements; ignores display info.
      *
      * Null elements compare less than non-null. Different kinds short-circuit
      * via `kind() <=> kind()`.
@@ -612,7 +612,7 @@ public:
             throw InvalidJsonException("Expected JSON object for ListCell", std::string(kind_id));
         }
 
-        const auto it_k = j.find(ICell::KEY_KIND);
+        const auto it_k = j.find(KEY_KIND);
         if (it_k == j.end() || !it_k->is_string()) {
             throw InvalidJsonException("ListCell: missing/invalid 'k' (expected 'l')",
                                        std::string(kind_id));
@@ -622,7 +622,7 @@ public:
                                         std::string(kind_id));
         }
 
-        const auto it_v = j.find(ICell::KEY_VALUE);
+        const auto it_v = j.find(KEY_VALUE);
         if (it_v == j.end() || !it_v->is_array()) {
             throw InvalidJsonException("ListCell: missing/invalid 'v' (expected array)",
                                        std::string(kind_id));
@@ -636,7 +636,7 @@ public:
             elems.push_back(raw.is_null() ? cell_t{} : reg.cell_from_json(raw));
         }
         auto cell = std::make_shared<ListCell>(std::move(elems));
-        base_t::absorb_meta(j, cell);
+        absorb_display_info(j, cell);
         return cell;
     }
 
@@ -656,9 +656,9 @@ public:
 class ListCellTypeDescriptor final : public BaseCellTypeDescriptor<ListCell> {
 public:
     using cell_type = ListCell;
-    using base_t = BaseCellTypeDescriptor<ListCell>;
+    using base_t = BaseCellTypeDescriptor;
 
-    explicit ListCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
+    explicit ListCellTypeDescriptor(DisplayInfo info) : base_t(std::move(info)) {}
 
     [[nodiscard]] descriptor::CellCategory category() const override {
         return descriptor::CellCategory::List;

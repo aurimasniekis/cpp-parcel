@@ -22,7 +22,7 @@ struct Address {
 class AddressCell : public parcel::StructCell<AddressCell, Address, "address"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Address"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -52,7 +52,7 @@ struct Person {
 class PersonCell : public parcel::StructCell<PersonCell, Person, "person"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Person"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -107,7 +107,7 @@ struct Pair {
 class PairCell : public parcel::StructCell<PairCell, Pair, "pair"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Pair"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -521,7 +521,7 @@ public:
     [[nodiscard]] std::string_view kind() const override {
         return kind_;
     }
-    [[nodiscard]] parcel::DisplayInfo meta() const override {
+    [[nodiscard]] parcel::DisplayInfo display_info() const override {
         return {};
     }
     [[nodiscard]] parcel::descriptor::CellCategory category() const override {

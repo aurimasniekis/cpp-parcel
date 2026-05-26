@@ -202,12 +202,12 @@ TEST(PrimitiveCell, descriptors_per_type_differ) {
     EXPECT_EQ(i64->kind(), "i64");
 }
 
-TEST(PrimitiveCell, descriptor_meta_uses_trait_metadata) {
+TEST(PrimitiveCell, descriptor_display_info_uses_trait_display_info) {
     const auto d = parcel::DoubleCell::descriptor();
-    const auto meta = d->meta();
-    EXPECT_EQ(meta.name, "F64");
-    ASSERT_TRUE(meta.description.has_value());
-    EXPECT_EQ(*meta.description, "64-bit floating-point number.");
+    const auto info = d->display_info();
+    EXPECT_EQ(info.name, "F64");
+    ASSERT_TRUE(info.description.has_value());
+    EXPECT_EQ(*info.description, "64-bit floating-point number.");
 }
 
 TEST(PrimitiveCell, descriptor_cell_from_json_round_trip) {
@@ -224,12 +224,12 @@ TEST(PrimitiveCell, descriptor_cell_from_json_round_trip) {
     EXPECT_EQ(typed->get(), 42);
 }
 
-TEST(PrimitiveCell, descriptor_to_json_includes_kind_and_meta) {
+TEST(PrimitiveCell, descriptor_to_json_includes_kind_and_display_info) {
     const auto d = parcel::BoolCell::descriptor();
     const auto j = d->to_json();
     EXPECT_EQ(j["kind"].get<std::string>(), "bool");
-    ASSERT_TRUE(j.contains("meta"));
-    EXPECT_EQ(j["meta"]["name"].get<std::string>(), "Bool");
+    ASSERT_TRUE(j.contains("display_info"));
+    EXPECT_EQ(j["display_info"]["name"].get<std::string>(), "Bool");
 }
 
 // ---------------------------------------------------------------------------
@@ -337,12 +337,12 @@ TEST(PrimitiveCell128, descriptor_is_cached_per_type) {
     EXPECT_EQ(a->kind(), "u128");
 }
 
-TEST(PrimitiveCell128, descriptor_meta_uses_trait_metadata) {
+TEST(PrimitiveCell128, descriptor_display_info_uses_trait_display_info) {
     const auto d = parcel::I128Cell::descriptor();
-    const auto meta = d->meta();
-    EXPECT_EQ(meta.name, "I128");
-    ASSERT_TRUE(meta.description.has_value());
-    EXPECT_EQ(*meta.description, "Signed 128-bit integer.");
+    const auto info = d->display_info();
+    EXPECT_EQ(info.name, "I128");
+    ASSERT_TRUE(info.description.has_value());
+    EXPECT_EQ(*info.description, "Signed 128-bit integer.");
 }
 
 TEST(PrimitiveCell128, to_json_emits_kind_and_value_keys_u128) {

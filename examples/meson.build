@@ -7,7 +7,7 @@ parcel_examples = {
     'parcel_struct_extras_demo':      'struct_extras_demo.cpp',
     'parcel_union_demo':              'union_demo.cpp',
     'parcel_registry_demo':           'registry_demo.cpp',
-    'parcel_meta_demo':                'meta_demo.cpp',
+    'parcel_display_info_demo':       'display_info_demo.cpp',
     'parcel_error_handling_demo':     'error_handling_demo.cpp',
     'parcel_defaults_demo':           'defaults_demo.cpp',
     'parcel_custom_primitive_demo':   'custom_primitive_demo.cpp',

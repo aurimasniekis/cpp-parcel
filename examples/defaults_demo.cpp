@@ -39,7 +39,7 @@ class SettingsCell : public parcel::StructCell<SettingsCell, Settings, "settings
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo display_info() {
         return {.name = "Settings"};
     }
 
