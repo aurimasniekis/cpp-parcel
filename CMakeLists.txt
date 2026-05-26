@@ -45,7 +45,7 @@ target_include_directories(parcel
 
 target_compile_features(parcel INTERFACE cxx_std_23)
 
-target_link_libraries(parcel INTERFACE nlohmann_json::nlohmann_json)
+target_link_libraries(parcel INTERFACE nlohmann_json::nlohmann_json commons::commons)
 
 if(PARCEL_ENABLE_CLANG_TIDY)
     find_program(PARCEL_CLANG_TIDY_EXE NAMES clang-tidy REQUIRED)
@@ -101,11 +101,11 @@ if(PARCEL_BUILD_DOCS)
     )
 endif()
 
-if(PARCEL_INSTALL AND DEFINED nlohmann_json_SOURCE_DIR)
+if(PARCEL_INSTALL AND (DEFINED nlohmann_json_SOURCE_DIR OR DEFINED commons_SOURCE_DIR))
     message(STATUS
-        "parcel: PARCEL_INSTALL disabled — nlohmann_json was built via FetchContent "
-        "and cannot be re-exported. Install nlohmann_json from a system package "
-        "(or use find_package) to re-enable parcel's install rules."
+        "parcel: PARCEL_INSTALL disabled — a dependency (nlohmann_json and/or commons) "
+        "was built via FetchContent and cannot be re-exported. Install the dependency "
+        "from a system package (or use find_package) to re-enable parcel's install rules."
     )
     set(PARCEL_INSTALL OFF)
 endif()

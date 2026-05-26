@@ -14,7 +14,6 @@
 
 #include <parcel/common.h>
 #include <parcel/error.h>
-#include <parcel/meta.h>
 
 #include <compare>
 #include <concepts>
@@ -102,7 +101,7 @@ struct ICell {
      * @brief Read-only access to this cell's optional descriptive metadata.
      * @return Reference to the held optional; empty when no meta is set.
      */
-    [[nodiscard]] virtual std::optional<descriptor::MetaInfo> const& meta() const = 0;
+    [[nodiscard]] virtual std::optional<DisplayInfo> const& meta() const = 0;
 
     /**
      * @brief Serialize this cell to its canonical JSON representation.
@@ -135,7 +134,7 @@ struct ICell {
      *
      * Compares by kind id first (lexicographic on the string view); within
      * the same kind, compares the held value. Metadata is intentionally
-     * ignored — two cells with the same kind/value but different `MetaInfo`
+     * ignored — two cells with the same kind/value but different `DisplayInfo`
      * are equivalent under this relation.
      *
      * @param other Cell to compare with.
@@ -150,7 +149,7 @@ struct ICell {
      *
      * Default implementation hashes the kind id and the JSON dump of `"v"`,
      * which works for every cell whose `to_json()` payload omits nested
-     * `MetaInfo`. Heterogeneous container cells (`ListCell`, `MapCell`,
+     * `DisplayInfo`. Heterogeneous container cells (`ListCell`, `MapCell`,
      * `HashMapCell`) override this to recurse through `hash_value()` on
      * their children — that is what keeps the hash meta-insensitive when
      * children carry meta of their own.
@@ -186,7 +185,7 @@ struct ICell {
      * @param m New meta to attach.
      * @return Fresh `cell_t`; this cell is unmodified.
      */
-    [[nodiscard]] cell_t with_meta(descriptor::MetaInfo m) const {
+    [[nodiscard]] cell_t with_meta(DisplayInfo m) const {
         auto c = clone();
         c->set_meta(std::move(m));
         return c;
@@ -198,7 +197,7 @@ struct ICell {
      * @return Fresh `cell_t`; this cell is unmodified.
      */
     [[nodiscard]] cell_t with_name(std::string v) const {
-        auto m = meta().value_or(descriptor::MetaInfo{});
+        auto m = meta().value_or(DisplayInfo{});
         m.name = std::move(v);
         return with_meta(std::move(m));
     }
@@ -209,31 +208,57 @@ struct ICell {
      * @return Fresh `cell_t`; this cell is unmodified.
      */
     [[nodiscard]] cell_t with_description(std::string v) const {
-        auto m = meta().value_or(descriptor::MetaInfo{});
+        auto m = meta().value_or(DisplayInfo{});
         m.description = std::move(v);
         return with_meta(std::move(m));
     }
 
     /**
-     * @brief Return a deep copy with `meta.icon` set to @p v.
-     * @param v New icon identifier.
+     * @brief Return a deep copy with `meta.icon` set to the typed @p icon.
+     * @param icon New icon.
      * @return Fresh `cell_t`; this cell is unmodified.
      */
-    [[nodiscard]] cell_t with_icon(std::string v) const {
-        auto m = meta().value_or(descriptor::MetaInfo{});
-        m.icon = std::move(v);
+    [[nodiscard]] cell_t with_icon(comms::Icon icon) const {
+        auto m = meta().value_or(DisplayInfo{});
+        m.icon = icon;
         return with_meta(std::move(m));
     }
 
     /**
-     * @brief Return a deep copy with `meta.color` set to @p v.
-     * @param v New color identifier.
+     * @brief Return a deep copy with `meta.icon` parsed from an Iconify
+     *        `set:name` string (e.g. `"mdi:account"`).
+     * @param v Iconify `set:name` identifier.
+     * @return Fresh `cell_t`; this cell is unmodified.
+     * @throws std::invalid_argument if @p v is not a valid `set:name` icon.
+     */
+    [[nodiscard]] cell_t with_icon(std::string const& v) const {
+        return with_icon(comms::Icon::from(v));
+    }
+
+    /**
+     * @brief Return a deep copy with `meta.color` set to the typed @p color.
+     * @param color New color.
      * @return Fresh `cell_t`; this cell is unmodified.
      */
-    [[nodiscard]] cell_t with_color(std::string v) const {
-        auto m = meta().value_or(descriptor::MetaInfo{});
-        m.color = std::move(v);
+    [[nodiscard]] cell_t with_color(comms::Color color) const {
+        auto m = meta().value_or(DisplayInfo{});
+        m.color = color;
         return with_meta(std::move(m));
+    }
+
+    /**
+     * @brief Return a deep copy with `meta.color` parsed from a color string
+     *        (hex like `"#ffcc00"`, a CSS-functional form, or a CSS color name).
+     * @param v Color string accepted by `comms::Color::parse`.
+     * @return Fresh `cell_t`; this cell is unmodified.
+     * @throws InvalidJsonException if @p v does not parse to a color.
+     */
+    [[nodiscard]] cell_t with_color(std::string const& v) const {
+        const auto parsed = comms::Color::parse(v);
+        if (!parsed) {
+            throw InvalidJsonException("with_color: '" + v + "' is not a valid color");
+        }
+        return with_color(*parsed);
     }
 
 protected:
@@ -243,7 +268,7 @@ protected:
      *        other public path mutates meta.
      * @param m New meta value (may be empty to clear).
      */
-    virtual void set_meta(std::optional<descriptor::MetaInfo> m) = 0;
+    virtual void set_meta(std::optional<DisplayInfo> m) = 0;
 
     template <typename, typename>
     friend struct BaseCell;
@@ -387,7 +412,7 @@ struct BaseCell : ICell {
         return Derived::kind_id;
     }
 
-    [[nodiscard]] std::optional<descriptor::MetaInfo> const& meta() const override {
+    [[nodiscard]] std::optional<DisplayInfo> const& meta() const override {
         return meta_;
     }
 
@@ -460,7 +485,7 @@ struct BaseCell : ICell {
      */
     void inject_meta(json_t& j) const {
         if (meta_) {
-            j[KEY_DESCRIPTION] = meta_->to_json();
+            j[KEY_DESCRIPTION] = *meta_;
         }
     }
 
@@ -473,15 +498,15 @@ struct BaseCell : ICell {
     template <typename Out>
     static void absorb_meta(json_t const& j, Out& out) {
         if (const auto it = j.find(KEY_DESCRIPTION); it != j.end()) {
-            out->set_meta(it->get<descriptor::MetaInfo>());
+            out->set_meta(it->get<DisplayInfo>());
         }
     }
 
 protected:
     /** @brief Optional descriptive metadata; omitted from JSON when empty. */
-    std::optional<descriptor::MetaInfo> meta_;
+    std::optional<DisplayInfo> meta_;
 
-    void set_meta(std::optional<descriptor::MetaInfo> m) override {
+    void set_meta(std::optional<DisplayInfo> m) override {
         meta_ = std::move(m);
     }
 
@@ -704,7 +729,7 @@ namespace std {
  * Routes to `ICell::hash_value`. Container cells recurse through their
  * children's `hash_value` so two cells that compare equal under
  * meta-insensitive equality also hash equal, even when nested cells differ
- * in their `MetaInfo`.
+ * in their `DisplayInfo`.
  */
 template <>
 struct hash<parcel::ICell> {

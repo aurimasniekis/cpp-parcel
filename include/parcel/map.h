@@ -60,7 +60,7 @@ public:
      * @brief Construct with the given descriptive metadata.
      * @param meta Descriptive metadata.
      */
-    explicit TypedMapCellTypeDescriptor(descriptor::MetaInfo meta) : base_t(std::move(meta)) {}
+    explicit TypedMapCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
 
     /** @brief Wire kind id of the map's value type. */
     [[nodiscard]] std::string_view element_kind() const {
@@ -366,7 +366,7 @@ public:
      * @return Shared `TypedMapCellTypeDescriptor<T>` instance.
      */
     static cell_type_descriptor_t descriptor() {
-        static const auto d = std::make_shared<TypedMapCellTypeDescriptor<T>>(descriptor::MetaInfo{
+        static const auto d = std::make_shared<TypedMapCellTypeDescriptor<T>>(DisplayInfo{
             .name = "Map",
             .description = std::string("Homogeneous map of ") + std::string(T::kind_id),
         });
@@ -644,7 +644,7 @@ public:
     using cell_type = MapCell;
     using base_t = BaseCellTypeDescriptor<MapCell>;
 
-    explicit MapCellTypeDescriptor(descriptor::MetaInfo meta) : base_t(std::move(meta)) {}
+    explicit MapCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
 
     [[nodiscard]] descriptor::CellCategory category() const override {
         return descriptor::CellCategory::Map;
@@ -657,7 +657,7 @@ public:
 
 inline cell_type_descriptor_t MapCell::descriptor() {
     static const auto d = std::make_shared<MapCellTypeDescriptor>(
-        descriptor::MetaInfo{.name = "Map", .description = "Heterogeneous map of cells"});
+        DisplayInfo{.name = "Map", .description = "Heterogeneous map of cells"});
     return d;
 }
 

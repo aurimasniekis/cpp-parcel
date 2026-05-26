@@ -33,7 +33,7 @@ struct WalkPayload {
 class WalkPayloadCell : public parcel::StructCell<WalkPayloadCell, WalkPayload, "walk_payload"> {
 public:
     using StructCell::StructCell;
-    static parcel::descriptor::MetaInfo meta_info() {
+    static parcel::DisplayInfo meta_info() {
         return {.name = "WalkPayload"};
     }
     static auto field_descriptors() {
@@ -661,7 +661,7 @@ struct PathPayload {
 class PathPayloadCell : public parcel::StructCell<PathPayloadCell, PathPayload, "path_payload"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "PathPayload"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -679,7 +679,7 @@ class TimestampPayloadCell
     : public parcel::StructCell<TimestampPayloadCell, TimestampPayload, "ts_payload"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "TimestampPayload"};
     }
     [[maybe_unused]] static auto field_descriptors() {

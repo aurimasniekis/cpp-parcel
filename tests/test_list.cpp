@@ -770,7 +770,7 @@ public:
 
     [[maybe_unused]] static parcel::cell_type_descriptor_t descriptor() {
         static const auto d = std::make_shared<parcel::SimpleCellTypeDescriptor<LiarCell>>(
-            parcel::descriptor::MetaInfo{.name = "Liar"});
+            parcel::DisplayInfo{.name = "Liar"});
         return d;
     }
 };

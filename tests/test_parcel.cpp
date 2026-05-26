@@ -185,7 +185,7 @@ TEST(parcel, optional_from_json_value_yields_some) {
 // ---------------------------------------------------------------------------
 // 128-bit zero serialization (json.h)
 
-#ifdef PARCEL_HAS_INT128
+#ifdef COMMONS_HAS_INT128
 
 TEST(parcel, u128_zero_serializes_to_zero_string) {
     const parcel::json_t j = parcel::u128{0};
@@ -202,13 +202,14 @@ TEST(parcel, i128_zero_serializes_to_zero_string) {
 TEST(parcel, i128_from_json_rejects_non_string) {
     parcel::json_t j = 42;
     parcel::i128 out;
-    EXPECT_THROW(j.get_to(out), std::runtime_error);
+    // commons' decoder surfaces failures as an nlohmann JSON error (other_error).
+    EXPECT_THROW(j.get_to(out), parcel::json_t::exception);
 }
 
 TEST(parcel, i128_from_json_rejects_empty_string) {
     parcel::json_t j = "";
     parcel::i128 out;
-    EXPECT_THROW(j.get_to(out), std::runtime_error);
+    EXPECT_THROW(j.get_to(out), parcel::json_t::exception);
 }
 
 TEST(parcel, i128_from_json_accepts_positive_sign) {
@@ -221,39 +222,38 @@ TEST(parcel, i128_from_json_accepts_positive_sign) {
 TEST(parcel, i128_from_json_rejects_non_digit) {
     parcel::json_t j = "12x4";
     parcel::i128 out;
-    EXPECT_THROW(j.get_to(out), std::runtime_error);
+    EXPECT_THROW(j.get_to(out), parcel::json_t::exception);
 }
 
-#endif  // PARCEL_HAS_INT128
+#endif  // COMMONS_HAS_INT128
 
 // ---------------------------------------------------------------------------
 // descriptor/meta.h round-trip through nlohmann::adl
 
 TEST(parcel, meta_info_from_json_round_trips_all_fields) {
-    const parcel::descriptor::MetaInfo original{
+    const parcel::DisplayInfo original{
         .name = "Demo",
         .description = "desc",
-        .icon = "ico",
-        .color = "red",
+        .icon = comms::Icon::from("mdi:information"),
+        .color = comms::Color::parse("red"),
     };
-    const auto j = original.to_json();
+    // DisplayInfo has no member to_json(); it serializes via free ADL functions.
+    const auto j = parcel::json_t(original);
 
-    parcel::descriptor::MetaInfo restored;
-    parcel::descriptor::from_json(j, restored);
+    const auto restored = j.get<parcel::DisplayInfo>();
 
     EXPECT_EQ(restored.name, "Demo");
     ASSERT_TRUE(restored.description.has_value());
     EXPECT_EQ(*restored.description, "desc");
     ASSERT_TRUE(restored.icon.has_value());
-    EXPECT_EQ(*restored.icon, "ico");
+    EXPECT_EQ(restored.icon, comms::Icon::from("mdi:information"));
     ASSERT_TRUE(restored.color.has_value());
-    EXPECT_EQ(*restored.color, "red");
+    EXPECT_EQ(restored.color, comms::Color::parse("red"));
 }
 
 TEST(parcel, meta_info_from_json_partial_input_leaves_others_default) {
     const parcel::json_t j = {{"name", "Only"}};
-    parcel::descriptor::MetaInfo restored;
-    parcel::descriptor::from_json(j, restored);
+    const auto restored = j.get<parcel::DisplayInfo>();
     EXPECT_EQ(restored.name, "Only");
     EXPECT_FALSE(restored.description.has_value());
     EXPECT_FALSE(restored.icon.has_value());

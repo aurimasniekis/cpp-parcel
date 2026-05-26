@@ -105,8 +105,8 @@ public:
     }
 
     static parcel::cell_type_descriptor_t descriptor() {
-        static const auto d = std::make_shared<parcel::SimpleCellTypeDescriptor<UuidCell>>(
-            parcel::descriptor::MetaInfo{
+        static const auto d =
+            std::make_shared<parcel::SimpleCellTypeDescriptor<UuidCell>>(parcel::DisplayInfo{
                 .name = "Uuid",
                 .description = "128-bit unique identifier (hex-encoded on the wire)",
             });
@@ -139,7 +139,7 @@ class AccountCell : public parcel::StructCell<AccountCell, Account, "account"> {
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Account"};
     }
 

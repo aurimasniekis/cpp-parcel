@@ -25,7 +25,7 @@ class PersonCell : public parcel::StructCell<PersonCell, Person, "person"> {
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Person", .description = "A person record"};
     }
 

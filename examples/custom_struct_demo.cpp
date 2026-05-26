@@ -99,7 +99,7 @@ public:
 
     static parcel::cell_type_descriptor_t descriptor() {
         static const auto d = std::make_shared<parcel::SimpleCellTypeDescriptor<UuidCell>>(
-            parcel::descriptor::MetaInfo{.name = "Uuid"});
+            parcel::DisplayInfo{.name = "Uuid"});
         return d;
     }
 };
@@ -133,7 +133,7 @@ class DocumentCell : public parcel::StructCell<DocumentCell, Document, "document
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Document", .description = "An indexed document"};
     }
 

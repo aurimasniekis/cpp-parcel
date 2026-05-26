@@ -43,7 +43,7 @@ public:
     using cell_type = TypedHashMapCell<T>;
     using base_t = BaseCellTypeDescriptor<TypedHashMapCell<T>>;
 
-    explicit TypedHashMapCellTypeDescriptor(descriptor::MetaInfo meta) : base_t(std::move(meta)) {}
+    explicit TypedHashMapCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
 
     [[nodiscard]] descriptor::CellCategory category() const override {
         return descriptor::CellCategory::TypedMap;
@@ -212,11 +212,10 @@ public:
     }
 
     static cell_type_descriptor_t descriptor() {
-        static const auto d =
-            std::make_shared<TypedHashMapCellTypeDescriptor<T>>(descriptor::MetaInfo{
-                .name = "HashMap",
-                .description = std::string("Hash-backed map of ") + std::string(T::kind_id),
-            });
+        static const auto d = std::make_shared<TypedHashMapCellTypeDescriptor<T>>(DisplayInfo{
+            .name = "HashMap",
+            .description = std::string("Hash-backed map of ") + std::string(T::kind_id),
+        });
         return d;
     }
 
@@ -414,7 +413,7 @@ public:
     using cell_type = HashMapCell;
     using base_t = BaseCellTypeDescriptor<HashMapCell>;
 
-    explicit HashMapCellTypeDescriptor(descriptor::MetaInfo meta) : base_t(std::move(meta)) {}
+    explicit HashMapCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
 
     [[nodiscard]] descriptor::CellCategory category() const override {
         return descriptor::CellCategory::Map;
@@ -426,8 +425,8 @@ public:
 };
 
 inline cell_type_descriptor_t HashMapCell::descriptor() {
-    static const auto d = std::make_shared<HashMapCellTypeDescriptor>(descriptor::MetaInfo{
-        .name = "HashMap", .description = "Hash-backed heterogeneous map of cells"});
+    static const auto d = std::make_shared<HashMapCellTypeDescriptor>(
+        DisplayInfo{.name = "HashMap", .description = "Hash-backed heterogeneous map of cells"});
     return d;
 }
 

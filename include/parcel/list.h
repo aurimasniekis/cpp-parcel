@@ -60,7 +60,7 @@ public:
      * @brief Construct with the given descriptive metadata.
      * @param meta Descriptive metadata.
      */
-    explicit TypedListCellTypeDescriptor(descriptor::MetaInfo meta) : base_t(std::move(meta)) {}
+    explicit TypedListCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
 
     /** @brief Wire kind id of the list's element type. */
     [[nodiscard]] std::string_view element_kind() const {
@@ -383,7 +383,7 @@ public:
      * @return Shared `TypedListCellTypeDescriptor<T>` instance.
      */
     static cell_type_descriptor_t descriptor() {
-        static const auto d = std::make_shared<TypedListCellTypeDescriptor<T>>(descriptor::MetaInfo{
+        static const auto d = std::make_shared<TypedListCellTypeDescriptor<T>>(DisplayInfo{
             .name = "List",
             .description = std::string("Homogeneous list of ") + std::string(T::kind_id),
         });
@@ -658,7 +658,7 @@ public:
     using cell_type = ListCell;
     using base_t = BaseCellTypeDescriptor<ListCell>;
 
-    explicit ListCellTypeDescriptor(descriptor::MetaInfo meta) : base_t(std::move(meta)) {}
+    explicit ListCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
 
     [[nodiscard]] descriptor::CellCategory category() const override {
         return descriptor::CellCategory::List;
@@ -671,7 +671,7 @@ public:
 
 inline cell_type_descriptor_t ListCell::descriptor() {
     static const auto d = std::make_shared<ListCellTypeDescriptor>(
-        descriptor::MetaInfo{.name = "List", .description = "Heterogeneous list of cells"});
+        DisplayInfo{.name = "List", .description = "Heterogeneous list of cells"});
     return d;
 }
 

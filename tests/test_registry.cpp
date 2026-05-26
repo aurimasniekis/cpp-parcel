@@ -22,7 +22,7 @@ struct Address {
 class AddressCell : public parcel::StructCell<AddressCell, Address, "address"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Address"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -52,7 +52,7 @@ struct Person {
 class PersonCell : public parcel::StructCell<PersonCell, Person, "person"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Person"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -68,8 +68,11 @@ public:
 parcel::ParcelRegistry basic_registry() {
     // Opt out of auto-populated builtins so this fixture's count_and_contains
     // assertions stay tight against the four kinds it explicitly registers.
-    parcel::ParcelRegistry reg(
-        {.primitives = false, .collections = false, .typed_collections = false, .std = false});
+    parcel::ParcelRegistry reg({.primitives = false,
+                                .collections = false,
+                                .typed_collections = false,
+                                .std = false,
+                                .commons = false});
     reg.register_kind(parcel::I32Cell::descriptor());
     reg.register_kind(parcel::StringCell::descriptor());
     reg.register_kind(parcel::U8Cell::descriptor());
@@ -104,7 +107,7 @@ struct Pair {
 class PairCell : public parcel::StructCell<PairCell, Pair, "pair"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Pair"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -159,8 +162,11 @@ TEST(Registry, count_and_contains) {
 }
 
 TEST(Registry, duplicate_register_overwrites_without_growing) {
-    parcel::ParcelRegistry reg(
-        {.primitives = false, .collections = false, .typed_collections = false, .std = false});
+    parcel::ParcelRegistry reg({.primitives = false,
+                                .collections = false,
+                                .typed_collections = false,
+                                .std = false,
+                                .commons = false});
     reg.register_kind(parcel::I32Cell::descriptor());
     reg.register_kind(parcel::StringCell::descriptor());
     EXPECT_EQ(reg.count(), 2u);
@@ -177,8 +183,11 @@ TEST(Registry, find_returns_nullptr_for_unknown_kind) {
 }
 
 TEST(Registry, kinds_returned_in_sorted_order) {
-    parcel::ParcelRegistry reg(
-        {.primitives = false, .collections = false, .typed_collections = false, .std = false});
+    parcel::ParcelRegistry reg({.primitives = false,
+                                .collections = false,
+                                .typed_collections = false,
+                                .std = false,
+                                .commons = false});
     reg.register_kind(parcel::U8Cell::descriptor());
     reg.register_kind(parcel::StringCell::descriptor());
     reg.register_kind(parcel::I32Cell::descriptor());
@@ -512,7 +521,7 @@ public:
     [[nodiscard]] std::string_view kind() const override {
         return kind_;
     }
-    [[nodiscard]] parcel::descriptor::MetaInfo meta() const override {
+    [[nodiscard]] parcel::DisplayInfo meta() const override {
         return {};
     }
     [[nodiscard]] parcel::descriptor::CellCategory category() const override {
@@ -568,8 +577,11 @@ TEST(Registry, define_referenced_unregistered_throws) {
     // Opt out so the only kinds present are the ones explicitly added below;
     // PersonCell references string/l:i32/m:string/address and only i32/person
     // exist, so define("person") must throw.
-    parcel::ParcelRegistry reg(
-        {.primitives = false, .collections = false, .typed_collections = false, .std = false});
+    parcel::ParcelRegistry reg({.primitives = false,
+                                .collections = false,
+                                .typed_collections = false,
+                                .std = false,
+                                .commons = false});
     reg.register_kind(parcel::I32Cell::descriptor());
     reg.register_kind(PersonCell::descriptor());
     EXPECT_THROW((void)reg.define("s:person"), std::runtime_error);
@@ -622,8 +634,11 @@ TEST(Registry, default_ctor_registers_builtins) {
 }
 
 TEST(Registry, opt_out_yields_empty_registry) {
-    const parcel::ParcelRegistry reg(
-        {.primitives = false, .collections = false, .typed_collections = false, .std = false});
+    const parcel::ParcelRegistry reg({.primitives = false,
+                                      .collections = false,
+                                      .typed_collections = false,
+                                      .std = false,
+                                      .commons = false});
     EXPECT_EQ(reg.count(), 0u);
 }
 
@@ -732,14 +747,16 @@ TEST(TryCellFromJson, union_active_kind_outside_alternatives_yields_kind_mismatc
     EXPECT_EQ(result.error().code, parcel::ParcelError::Code::KindMismatch);
 }
 
-TEST(TryCellFromJson, i128_non_string_value_yields_invalid_json) {
+TEST(TryCellFromJson, i128_non_string_value_yields_type_error) {
     parcel::ParcelRegistry reg;
     reg.register_kind(parcel::I128Cell::descriptor());
-    // i128 must be a decimal string; passing a number trips the
-    // adl_serializer<__int128_t>::from_json check, which now throws
-    // InvalidJsonException with kind="i128".
+    // i128 must be a decimal string; passing a number trips commons'
+    // adl_serializer<comms::i128>::from_json, which throws an nlohmann JSON
+    // error (other_error) — a generic, non-ParcelException type. try_cell_from_json
+    // maps those to TypeError, tagged with the dispatch kind.
     const parcel::json_t bad = {{"k", "i128"}, {"v", 42}};
     const auto result = reg.try_cell_from_json(bad);
     ASSERT_FALSE(result.has_value());
-    EXPECT_EQ(result.error().code, parcel::ParcelError::Code::InvalidJson);
+    EXPECT_EQ(result.error().code, parcel::ParcelError::Code::TypeError);
+    EXPECT_EQ(result.error().kind, "i128");
 }

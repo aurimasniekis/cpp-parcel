@@ -29,7 +29,7 @@ int main() {
     const auto annotated = parcel::I32Cell{42}
                                .with_name("Answer")
                                ->with_description("To life, the universe, and everything")
-                               ->with_icon("star")
+                               ->with_icon("mdi:star")
                                ->with_color("#ffcc00");
     std::cout << annotated->to_json().dump(2) << '\n';
 
@@ -43,8 +43,7 @@ int main() {
     std::cout << "restored.meta->color        = " << *restored->meta()->color << '\n';
 
     print_section("with_meta replaces the whole struct");
-    const auto replaced =
-        annotated->with_meta(parcel::descriptor::MetaInfo{.description = "just a number"});
+    const auto replaced = annotated->with_meta(parcel::DisplayInfo{.description = "just a number"});
     std::cout << "replaced.meta->name?         " << replaced->meta()->name.has_value() << '\n';
     std::cout << "replaced.meta->description = " << *replaced->meta()->description << '\n';
 

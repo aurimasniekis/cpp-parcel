@@ -54,9 +54,8 @@ public:
     }
 
     static cell_type_descriptor_t descriptor() {
-        static const auto d =
-            std::make_shared<SimpleCellTypeDescriptor<PathCell>>(descriptor::MetaInfo{
-                .name = "Path", .description = "Filesystem path (UTF-8 generic form)"});
+        static const auto d = std::make_shared<SimpleCellTypeDescriptor<PathCell>>(
+            DisplayInfo{.name = "Path", .description = "Filesystem path (UTF-8 generic form)"});
         return d;
     }
 };

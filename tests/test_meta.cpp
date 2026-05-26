@@ -16,7 +16,7 @@ class PersonCell : public parcel::StructCell<PersonCell, Person, "person"> {
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Person"};
     }
 
@@ -56,13 +56,13 @@ TEST(CellMeta, chained_builders_accumulate_fields) {
     const auto cell = parcel::I32Cell{7}
                           .with_name("Lucky")
                           ->with_description("A lucky number")
-                          ->with_icon("star")
+                          ->with_icon("mdi:star")
                           ->with_color("#ffcc00");
     ASSERT_TRUE(cell->meta().has_value());
     EXPECT_EQ(cell->meta()->name, "Lucky");
     EXPECT_EQ(cell->meta()->description, "A lucky number");
-    EXPECT_EQ(cell->meta()->icon, "star");
-    EXPECT_EQ(cell->meta()->color, "#ffcc00");
+    EXPECT_EQ(cell->meta()->icon, comms::Icon::from("mdi:star"));
+    EXPECT_EQ(cell->meta()->color, comms::Color::parse("#ffcc00"));
 }
 
 TEST(CellMeta, with_description_alone_omits_name) {
@@ -77,7 +77,7 @@ TEST(CellMeta, with_meta_replaces_whole_struct) {
     const auto first = base->with_name("A")->with_color("red");
     ASSERT_TRUE(first->meta().has_value());
 
-    const auto replaced = first->with_meta(parcel::descriptor::MetaInfo{.description = "B"});
+    const auto replaced = first->with_meta(parcel::DisplayInfo{.description = "B"});
     ASSERT_TRUE(replaced->meta().has_value());
     EXPECT_FALSE(replaced->meta()->name.has_value());
     EXPECT_FALSE(replaced->meta()->color.has_value());
@@ -102,14 +102,18 @@ TEST(CellMeta, to_json_emits_d_with_only_set_fields) {
 }
 
 TEST(CellMeta, to_json_emits_d_with_full_meta) {
-    const auto annotated =
-        parcel::I32Cell{1}.with_name("N")->with_description("D")->with_icon("I")->with_color("C");
+    const auto annotated = parcel::I32Cell{1}
+                               .with_name("N")
+                               ->with_description("D")
+                               ->with_icon("mdi:information")
+                               ->with_color("cyan");
     const auto j = annotated->to_json();
     ASSERT_TRUE(j.contains("d"));
     EXPECT_EQ(j["d"]["name"], "N");
     EXPECT_EQ(j["d"]["description"], "D");
-    EXPECT_EQ(j["d"]["icon"], "I");
-    EXPECT_EQ(j["d"]["color"], "C");
+    // icon serializes as its Iconify set:name string; color as a hex string.
+    EXPECT_EQ(j["d"]["icon"], "mdi:information");
+    EXPECT_EQ(j["d"]["color"], "#00ffff");
 }
 
 // ---------------------------------------------------------------------------
@@ -168,13 +172,13 @@ TEST(CellMeta, typed_map_round_trip) {
     const auto j = annotated->to_json();
     const auto restored = reg.cell_from_json(j);
     ASSERT_TRUE(restored->meta().has_value());
-    EXPECT_EQ(restored->meta()->color, "blue");
+    EXPECT_EQ(restored->meta()->color, comms::Color::parse("blue"));
 }
 
 TEST(CellMeta, map_round_trip_outer_and_element_meta) {
     const auto reg = make_registry();
     parcel::MapCell m;
-    m.emplace("x", std::make_shared<parcel::I32Cell>(1)->with_icon("dot"));
+    m.emplace("x", std::make_shared<parcel::I32Cell>(1)->with_icon("mdi:dot"));
     const auto annotated = m.with_name("Bag");
 
     const auto j = annotated->to_json();
@@ -187,7 +191,7 @@ TEST(CellMeta, map_round_trip_outer_and_element_meta) {
     const auto it = mc->find("x");
     ASSERT_NE(it, mc->end());
     ASSERT_TRUE(it->second->meta().has_value());
-    EXPECT_EQ(it->second->meta()->icon, "dot");
+    EXPECT_EQ(it->second->meta()->icon, comms::Icon::from("mdi:dot"));
 }
 
 TEST(CellMeta, struct_round_trip) {

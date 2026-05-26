@@ -24,7 +24,7 @@ class PersonCell : public parcel::StructCell<PersonCell, Person, "person"> {
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Person"};
     }
 
@@ -43,7 +43,7 @@ public:
     SelfNode() = default;
     SelfNode(const std::int32_t v, std::string s) : value_(v), text_(std::move(s)) {}
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "SelfNode"};
     }
 
@@ -355,7 +355,7 @@ TEST(CellCompare, roundtrip_struct_equal_after_json) {
 // ---------------------------------------------------------------------------
 // Hash equality-consistency: two cells that compare equal under
 // `operator==` must hash equal, even when nested children carry differing
-// MetaInfo. The list/map/hashmap overrides recurse via hash_value() so
+// DisplayInfo. The list/map/hashmap overrides recurse via hash_value() so
 // nested meta is never observed.
 
 TEST(CellCompare, list_hash_ignores_nested_meta) {

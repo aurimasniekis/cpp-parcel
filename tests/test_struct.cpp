@@ -20,7 +20,7 @@ class ActionCell : public parcel::StructCell<ActionCell, Action, "action"> {
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Action", .description = "An action"};
     }
 
@@ -46,7 +46,7 @@ class NoteCell : public parcel::StructCell<NoteCell, Note, "note"> {
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Note"};
     }
 
@@ -67,7 +67,7 @@ public:
 
     [[maybe_unused]] static constexpr bool allow_extra_fields = true;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "LenientAction"};
     }
 
@@ -506,7 +506,7 @@ struct Address {
 class AddressCell : public parcel::StructCell<AddressCell, Address, "address"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Address"};
     }
     [[maybe_unused]] [[maybe_unused]] static auto field_descriptors() {
@@ -537,7 +537,7 @@ struct Person {
 class PersonCell : public parcel::StructCell<PersonCell, Person, "person"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Person"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -649,7 +649,7 @@ struct Profile {
 class ProfileCell : public parcel::StructCell<ProfileCell, Profile, "profile"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Profile"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -668,7 +668,7 @@ class ProfileRequiredCell
     : public parcel::StructCell<ProfileRequiredCell, ProfileRequired, "profile_required"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "ProfileRequired"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -686,7 +686,7 @@ struct OptScores {
 class OptScoresCell : public parcel::StructCell<OptScoresCell, OptScores, "opt_scores"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "OptScores"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -861,7 +861,7 @@ public:
 
     [[maybe_unused]] static parcel::cell_type_descriptor_t descriptor() {
         static const auto d = std::make_shared<parcel::SimpleCellTypeDescriptor<LiarCell>>(
-            parcel::descriptor::MetaInfo{.name = "LiarS"});
+            parcel::DisplayInfo{.name = "LiarS"});
         return d;
     }
 };
@@ -874,7 +874,7 @@ class LyingStructCell : public parcel::StructCell<LyingStructCell, LyingPayload,
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "LyingStruct"};
     }
 
@@ -909,7 +909,7 @@ class StreetAddressCell
     : public parcel::StructCell<StreetAddressCell, StreetAddress, "street_address"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "StreetAddress"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -929,7 +929,7 @@ struct HomeAddress : StreetAddress {
 class HomeAddressCell : public parcel::StructCell<HomeAddressCell, HomeAddress, "home_address"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "HomeAddress"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -949,7 +949,7 @@ struct UnrelatedPayload {
 class UnrelatedCell : public parcel::StructCell<UnrelatedCell, UnrelatedPayload, "unrelated"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Unrelated"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -1058,7 +1058,7 @@ class HomeAddressWithRequiredCityOverrideCell
           StructCell<HomeAddressWithRequiredCityOverrideCell, HomeAddress, "home_address_v2"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "HomeAddressV2"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -1076,7 +1076,7 @@ class HomeAddressWithoutCityCell
     : public parcel::StructCell<HomeAddressWithoutCityCell, HomeAddress, "home_address_no_city"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "HomeAddressNoCity"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -1139,7 +1139,7 @@ public:
 
     [[maybe_unused]] static constexpr std::string_view kind_id = "s:my_direct";
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "MyDirect"};
     }
 
@@ -1155,7 +1155,7 @@ public:
 // declares its own kind_id namespace ("s:event:") via id_join_lit_v,
 // owns a protected timestamp_ field, and delegates field declaration to a
 // concrete-side hook.
-template <typename Self, parcel::fixed_string EventId>
+template <typename Self, parcel::FixedString EventId>
 class BaseEvent : public parcel::SelfStructCell<Self> {
 public:
     static constexpr std::string_view kind_id = parcel::id_join_lit_v<"s:event:", EventId>;
@@ -1171,7 +1171,7 @@ public:
         timestamp_ = v;
     }
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Event"};
     }
 
@@ -1202,7 +1202,7 @@ public:
     [[maybe_unused]] static constexpr std::string_view kind_id = "s:lenient_self";
     [[maybe_unused]] static constexpr bool allow_extra_fields = true;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "LenientSelf"};
     }
 
@@ -1232,7 +1232,7 @@ public:
         return hidden_label_;
     }
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "ProtectedFields"};
     }
 
@@ -1427,14 +1427,14 @@ class IconColorCell : public parcel::StructCell<IconColorCell, IconColorPayload,
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "IconColor"};
     }
 
     [[maybe_unused]] static auto field_descriptors() {
         return parcel::FieldsBuilder<IconColorPayload>{}
             .field<&IconColorPayload::x, parcel::I32Cell>("x")
-            .icon("star")
+            .icon("mdi:star")
             .color("red")
             .build();
     }
@@ -1449,7 +1449,7 @@ class DupKeyCell : public parcel::StructCell<DupKeyCell, DupKeyPayload, "dup_key
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "DupKey"};
     }
 
@@ -1470,7 +1470,7 @@ public:
 
     [[maybe_unused]] static constexpr bool allow_extra_fields = true;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "TwinLenientAction"};
     }
 
@@ -1490,13 +1490,15 @@ TEST(FieldsBuilder, icon_sets_field_meta_icon) {
     const auto j = d->to_json();
     ASSERT_TRUE(j["fields"].is_array());
     ASSERT_EQ(j["fields"].size(), 1u);
-    EXPECT_EQ(j["fields"][0]["meta"]["icon"].get<std::string>(), "star");
+    // Icon serializes as its canonical Iconify set:name string.
+    EXPECT_EQ(j["fields"][0]["meta"]["icon"].get<std::string>(), "mdi:star");
 }
 
 TEST(FieldsBuilder, color_sets_field_meta_color) {
     const auto d = IconColorCell::descriptor();
     const auto j = d->to_json();
-    EXPECT_EQ(j["fields"][0]["meta"]["color"].get<std::string>(), "red");
+    // The CSS name "red" parses and serializes back as its hex form.
+    EXPECT_EQ(j["fields"][0]["meta"]["color"].get<std::string>(), "#ff0000");
 }
 
 TEST(FieldsBuilder, description_before_field_throws) {
@@ -1504,11 +1506,15 @@ TEST(FieldsBuilder, description_before_field_throws) {
         { parcel::FieldsBuilder<IconColorPayload>{}.description("x"); }, std::runtime_error);
 }
 
-TEST(FieldsBuilder, icon_before_field_throws) {
-    EXPECT_THROW({ parcel::FieldsBuilder<IconColorPayload>{}.icon("x"); }, std::runtime_error);
+// The string overloads validate their argument before reaching the
+// "must follow a field<>()" check, so an invalid icon/color throws first: an
+// unparseable icon throws std::invalid_argument (from comms::Icon::from) and an
+// unparseable color throws InvalidJsonException (a std::runtime_error).
+TEST(FieldsBuilder, icon_with_invalid_value_throws) {
+    EXPECT_THROW({ parcel::FieldsBuilder<IconColorPayload>{}.icon("x"); }, std::invalid_argument);
 }
 
-TEST(FieldsBuilder, color_before_field_throws) {
+TEST(FieldsBuilder, color_with_invalid_value_throws) {
     EXPECT_THROW({ parcel::FieldsBuilder<IconColorPayload>{}.color("x"); }, std::runtime_error);
 }
 

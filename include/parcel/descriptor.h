@@ -13,7 +13,6 @@
 
 #include <parcel/cell.h>
 #include <parcel/common.h>
-#include <parcel/meta.h>
 
 #include <map>
 #include <memory>
@@ -67,7 +66,7 @@ struct ICellTypeDescriptor {
     [[nodiscard]] virtual std::string_view kind() const = 0;
 
     /** @brief Descriptive metadata for this cell type. */
-    [[nodiscard]] virtual descriptor::MetaInfo meta() const = 0;
+    [[nodiscard]] virtual DisplayInfo meta() const = 0;
 
     /** @brief Coarse classification (primitive, list, struct, …). */
     [[nodiscard]] virtual descriptor::CellCategory category() const = 0;
@@ -107,7 +106,7 @@ struct IFieldDescriptor {
     [[nodiscard]] virtual std::string_view kind() const = 0;
 
     /** @brief Descriptive metadata for this field. */
-    [[nodiscard]] virtual descriptor::MetaInfo meta() const = 0;
+    [[nodiscard]] virtual DisplayInfo meta() const = 0;
 
     /** @brief Whether the field must be present on deserialization. */
     [[nodiscard]] virtual bool is_required() const = 0;
@@ -174,13 +173,13 @@ public:
      * @brief Construct with the given descriptive metadata.
      * @param meta Descriptive metadata.
      */
-    explicit BaseCellTypeDescriptor(descriptor::MetaInfo meta) : meta_(std::move(meta)) {}
+    explicit BaseCellTypeDescriptor(DisplayInfo meta) : meta_(std::move(meta)) {}
 
     [[nodiscard]] std::string_view kind() const override {
         return kind_id;
     }
 
-    [[nodiscard]] descriptor::MetaInfo meta() const override {
+    [[nodiscard]] DisplayInfo meta() const override {
         return meta_;
     }
 
@@ -194,7 +193,7 @@ public:
 
 protected:
     /** @brief Stored descriptive metadata. */
-    descriptor::MetaInfo meta_;
+    DisplayInfo meta_;
 
     /**
      * @brief Common JSON skeleton (`kind`, `meta`, `category`) reused by overrides.
@@ -203,7 +202,7 @@ protected:
     [[nodiscard]] json_t base_to_json() const {
         return json_t{
             {"kind", kind_id},
-            {"meta", meta_.to_json()},
+            {"meta", json_t(meta_)},
             {"category", this->category()},
         };
     }
@@ -226,7 +225,7 @@ public:
      * @brief Construct with the given descriptive metadata.
      * @param meta Descriptive metadata.
      */
-    explicit SimpleCellTypeDescriptor(descriptor::MetaInfo meta)
+    explicit SimpleCellTypeDescriptor(DisplayInfo meta)
         : BaseCellTypeDescriptor<T>(std::move(meta)) {}
 
     [[nodiscard]] descriptor::CellCategory category() const override {

@@ -24,6 +24,7 @@
  * @endcode
  */
 
+#include <parcel/commons.h>
 #include <parcel/ext/chrono.h>
 #include <parcel/ext/filesystem.h>
 #include <parcel/list.h>
@@ -60,7 +61,7 @@ using FloatListCell = TypedListCell<FloatCell>;
 using DoubleListCell = TypedListCell<DoubleCell>;
 /** @brief `TypedListCell<StringCell>`. */
 using StringListCell = TypedListCell<StringCell>;
-#ifdef PARCEL_HAS_INT128
+#ifdef COMMONS_HAS_INT128
 /** @brief `TypedListCell<U128Cell>`. */
 using U128ListCell = TypedListCell<U128Cell>;
 /** @brief `TypedListCell<I128Cell>`. */
@@ -93,7 +94,7 @@ using FloatMapCell = TypedMapCell<FloatCell>;
 using DoubleMapCell = TypedMapCell<DoubleCell>;
 /** @brief `TypedMapCell<StringCell>`. */
 using StringMapCell = TypedMapCell<StringCell>;
-#ifdef PARCEL_HAS_INT128
+#ifdef COMMONS_HAS_INT128
 /** @brief `TypedMapCell<U128Cell>`. */
 using U128MapCell = TypedMapCell<U128Cell>;
 /** @brief `TypedMapCell<I128Cell>`. */
@@ -126,12 +127,77 @@ using FloatHashMapCell = TypedHashMapCell<FloatCell>;
 using DoubleHashMapCell = TypedHashMapCell<DoubleCell>;
 /** @brief `TypedHashMapCell<StringCell>`. */
 using StringHashMapCell = TypedHashMapCell<StringCell>;
-#ifdef PARCEL_HAS_INT128
+#ifdef COMMONS_HAS_INT128
 /** @brief `TypedHashMapCell<U128Cell>`. */
 using U128HashMapCell = TypedHashMapCell<U128Cell>;
 /** @brief `TypedHashMapCell<I128Cell>`. */
 using I128HashMapCell = TypedHashMapCell<I128Cell>;
 #endif
+
+// Complex typed collections (wire kinds e.g. "l:cf64", "m:cs8", "hm:cu32").
+
+/** @brief `TypedListCell<Cs8Cell>`. */
+using Cs8ListCell = TypedListCell<Cs8Cell>;
+/** @brief `TypedListCell<Cs16Cell>`. */
+using Cs16ListCell = TypedListCell<Cs16Cell>;
+/** @brief `TypedListCell<Cs32Cell>`. */
+using Cs32ListCell = TypedListCell<Cs32Cell>;
+/** @brief `TypedListCell<Cs64Cell>`. */
+using Cs64ListCell = TypedListCell<Cs64Cell>;
+/** @brief `TypedListCell<Cu8Cell>`. */
+using Cu8ListCell = TypedListCell<Cu8Cell>;
+/** @brief `TypedListCell<Cu16Cell>`. */
+using Cu16ListCell = TypedListCell<Cu16Cell>;
+/** @brief `TypedListCell<Cu32Cell>`. */
+using Cu32ListCell = TypedListCell<Cu32Cell>;
+/** @brief `TypedListCell<Cu64Cell>`. */
+using Cu64ListCell = TypedListCell<Cu64Cell>;
+/** @brief `TypedListCell<Cf32Cell>`. */
+using Cf32ListCell = TypedListCell<Cf32Cell>;
+/** @brief `TypedListCell<Cf64Cell>`. */
+using Cf64ListCell = TypedListCell<Cf64Cell>;
+
+/** @brief `TypedMapCell<Cs8Cell>`. */
+using Cs8MapCell = TypedMapCell<Cs8Cell>;
+/** @brief `TypedMapCell<Cs16Cell>`. */
+using Cs16MapCell = TypedMapCell<Cs16Cell>;
+/** @brief `TypedMapCell<Cs32Cell>`. */
+using Cs32MapCell = TypedMapCell<Cs32Cell>;
+/** @brief `TypedMapCell<Cs64Cell>`. */
+using Cs64MapCell = TypedMapCell<Cs64Cell>;
+/** @brief `TypedMapCell<Cu8Cell>`. */
+using Cu8MapCell = TypedMapCell<Cu8Cell>;
+/** @brief `TypedMapCell<Cu16Cell>`. */
+using Cu16MapCell = TypedMapCell<Cu16Cell>;
+/** @brief `TypedMapCell<Cu32Cell>`. */
+using Cu32MapCell = TypedMapCell<Cu32Cell>;
+/** @brief `TypedMapCell<Cu64Cell>`. */
+using Cu64MapCell = TypedMapCell<Cu64Cell>;
+/** @brief `TypedMapCell<Cf32Cell>`. */
+using Cf32MapCell = TypedMapCell<Cf32Cell>;
+/** @brief `TypedMapCell<Cf64Cell>`. */
+using Cf64MapCell = TypedMapCell<Cf64Cell>;
+
+/** @brief `TypedHashMapCell<Cs8Cell>`. */
+using Cs8HashMapCell = TypedHashMapCell<Cs8Cell>;
+/** @brief `TypedHashMapCell<Cs16Cell>`. */
+using Cs16HashMapCell = TypedHashMapCell<Cs16Cell>;
+/** @brief `TypedHashMapCell<Cs32Cell>`. */
+using Cs32HashMapCell = TypedHashMapCell<Cs32Cell>;
+/** @brief `TypedHashMapCell<Cs64Cell>`. */
+using Cs64HashMapCell = TypedHashMapCell<Cs64Cell>;
+/** @brief `TypedHashMapCell<Cu8Cell>`. */
+using Cu8HashMapCell = TypedHashMapCell<Cu8Cell>;
+/** @brief `TypedHashMapCell<Cu16Cell>`. */
+using Cu16HashMapCell = TypedHashMapCell<Cu16Cell>;
+/** @brief `TypedHashMapCell<Cu32Cell>`. */
+using Cu32HashMapCell = TypedHashMapCell<Cu32Cell>;
+/** @brief `TypedHashMapCell<Cu64Cell>`. */
+using Cu64HashMapCell = TypedHashMapCell<Cu64Cell>;
+/** @brief `TypedHashMapCell<Cf32Cell>`. */
+using Cf32HashMapCell = TypedHashMapCell<Cf32Cell>;
+/** @brief `TypedHashMapCell<Cf64Cell>`. */
+using Cf64HashMapCell = TypedHashMapCell<Cf64Cell>;
 
 /**
  * @brief Register every `PrimitiveCell<T>` into @p reg.
@@ -150,8 +216,18 @@ inline void register_primitives(ParcelRegistry& reg) {
     reg.register_kind(I64Cell::descriptor());
     reg.register_kind(FloatCell::descriptor());
     reg.register_kind(DoubleCell::descriptor());
+    reg.register_kind(Cs8Cell::descriptor());
+    reg.register_kind(Cs16Cell::descriptor());
+    reg.register_kind(Cs32Cell::descriptor());
+    reg.register_kind(Cs64Cell::descriptor());
+    reg.register_kind(Cu8Cell::descriptor());
+    reg.register_kind(Cu16Cell::descriptor());
+    reg.register_kind(Cu32Cell::descriptor());
+    reg.register_kind(Cu64Cell::descriptor());
+    reg.register_kind(Cf32Cell::descriptor());
+    reg.register_kind(Cf64Cell::descriptor());
     reg.register_kind(StringCell::descriptor());
-#ifdef PARCEL_HAS_INT128
+#ifdef COMMONS_HAS_INT128
     reg.register_kind(U128Cell::descriptor());
     reg.register_kind(I128Cell::descriptor());
 #endif
@@ -191,10 +267,20 @@ inline void register_typed_collections(ParcelRegistry& reg) {
     reg.register_kind(FloatListCell::descriptor());
     reg.register_kind(DoubleListCell::descriptor());
     reg.register_kind(StringListCell::descriptor());
-#ifdef PARCEL_HAS_INT128
+#ifdef COMMONS_HAS_INT128
     reg.register_kind(U128ListCell::descriptor());
     reg.register_kind(I128ListCell::descriptor());
 #endif
+    reg.register_kind(Cs8ListCell::descriptor());
+    reg.register_kind(Cs16ListCell::descriptor());
+    reg.register_kind(Cs32ListCell::descriptor());
+    reg.register_kind(Cs64ListCell::descriptor());
+    reg.register_kind(Cu8ListCell::descriptor());
+    reg.register_kind(Cu16ListCell::descriptor());
+    reg.register_kind(Cu32ListCell::descriptor());
+    reg.register_kind(Cu64ListCell::descriptor());
+    reg.register_kind(Cf32ListCell::descriptor());
+    reg.register_kind(Cf64ListCell::descriptor());
 
     reg.register_kind(CharMapCell::descriptor());
     reg.register_kind(BoolMapCell::descriptor());
@@ -209,10 +295,20 @@ inline void register_typed_collections(ParcelRegistry& reg) {
     reg.register_kind(FloatMapCell::descriptor());
     reg.register_kind(DoubleMapCell::descriptor());
     reg.register_kind(StringMapCell::descriptor());
-#ifdef PARCEL_HAS_INT128
+#ifdef COMMONS_HAS_INT128
     reg.register_kind(U128MapCell::descriptor());
     reg.register_kind(I128MapCell::descriptor());
 #endif
+    reg.register_kind(Cs8MapCell::descriptor());
+    reg.register_kind(Cs16MapCell::descriptor());
+    reg.register_kind(Cs32MapCell::descriptor());
+    reg.register_kind(Cs64MapCell::descriptor());
+    reg.register_kind(Cu8MapCell::descriptor());
+    reg.register_kind(Cu16MapCell::descriptor());
+    reg.register_kind(Cu32MapCell::descriptor());
+    reg.register_kind(Cu64MapCell::descriptor());
+    reg.register_kind(Cf32MapCell::descriptor());
+    reg.register_kind(Cf64MapCell::descriptor());
 
     reg.register_kind(CharHashMapCell::descriptor());
     reg.register_kind(BoolHashMapCell::descriptor());
@@ -227,10 +323,20 @@ inline void register_typed_collections(ParcelRegistry& reg) {
     reg.register_kind(FloatHashMapCell::descriptor());
     reg.register_kind(DoubleHashMapCell::descriptor());
     reg.register_kind(StringHashMapCell::descriptor());
-#ifdef PARCEL_HAS_INT128
+#ifdef COMMONS_HAS_INT128
     reg.register_kind(U128HashMapCell::descriptor());
     reg.register_kind(I128HashMapCell::descriptor());
 #endif
+    reg.register_kind(Cs8HashMapCell::descriptor());
+    reg.register_kind(Cs16HashMapCell::descriptor());
+    reg.register_kind(Cs32HashMapCell::descriptor());
+    reg.register_kind(Cs64HashMapCell::descriptor());
+    reg.register_kind(Cu8HashMapCell::descriptor());
+    reg.register_kind(Cu16HashMapCell::descriptor());
+    reg.register_kind(Cu32HashMapCell::descriptor());
+    reg.register_kind(Cu64HashMapCell::descriptor());
+    reg.register_kind(Cf32HashMapCell::descriptor());
+    reg.register_kind(Cf64HashMapCell::descriptor());
 }
 
 /**
@@ -252,6 +358,23 @@ inline void register_std(ParcelRegistry& reg) {
 }
 
 /**
+ * @brief Register the commons-adapter cells into @p reg.
+ *
+ * Registers `ColorCell`, `IconCell`, `DisplayInfoCell`, `FlagCell`, and
+ * `FlagSetCell` from `parcel/commons.h` so a default-constructed registry
+ * dispatches the `aurimasniekis/cpp-commons` vocabulary types out of the box.
+ *
+ * @param reg Registry to populate.
+ */
+inline void register_commons(ParcelRegistry& reg) {
+    reg.register_kind(ColorCell::descriptor());
+    reg.register_kind(IconCell::descriptor());
+    reg.register_kind(DisplayInfoCell::descriptor());
+    reg.register_kind(FlagCell::descriptor());
+    reg.register_kind(FlagSetCell::descriptor());
+}
+
+/**
  * @brief Apply the @p opts toggles to populate @p reg with built-in cells.
  * @param reg  Registry to populate.
  * @param opts Toggles for which built-ins to register.
@@ -268,6 +391,9 @@ inline void register_builtins(ParcelRegistry& reg, const BuiltinsOptions opts = 
     }
     if (opts.std) {
         register_std(reg);
+    }
+    if (opts.commons) {
+        register_commons(reg);
     }
 }
 

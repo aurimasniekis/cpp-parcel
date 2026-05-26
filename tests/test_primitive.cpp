@@ -233,9 +233,9 @@ TEST(PrimitiveCell, descriptor_to_json_includes_kind_and_meta) {
 }
 
 // ---------------------------------------------------------------------------
-// 128-bit integer support (compiler-dependent; gated by PARCEL_HAS_INT128).
+// 128-bit integer support (compiler-dependent; gated by COMMONS_HAS_INT128).
 
-#ifdef PARCEL_HAS_INT128
+#ifdef COMMONS_HAS_INT128
 
 static_assert(parcel::CellLike<parcel::U128Cell>);
 static_assert(parcel::CellLike<parcel::I128Cell>);
@@ -428,42 +428,46 @@ TEST(PrimitiveCell128, from_json_round_trip_i128_min) {
     EXPECT_EQ(typed->get(), i_min);
 }
 
+// commons' 128-bit decoder (v0.1.3+) validates and range-checks, surfacing
+// every failure as an nlohmann JSON error (other_error 502) — the same
+// rejection parcel performed before, now delegated to commons. The error type
+// is therefore `parcel::json_t::exception` (nlohmann's base), not a parcel one.
 TEST(PrimitiveCell128, from_json_rejects_non_string_v_for_u128) {
     parcel::json_t j = {{"k", "u128"}, {"v", 42}};  // number, not string
-    EXPECT_THROW(parcel::U128Cell::from_json(j, registry()), std::runtime_error);
+    EXPECT_THROW(parcel::U128Cell::from_json(j, registry()), parcel::json_t::exception);
 }
 
 TEST(PrimitiveCell128, from_json_rejects_non_digit_in_string) {
     parcel::json_t j = {{"k", "u128"}, {"v", "12x4"}};
-    EXPECT_THROW(parcel::U128Cell::from_json(j, registry()), std::runtime_error);
+    EXPECT_THROW(parcel::U128Cell::from_json(j, registry()), parcel::json_t::exception);
 }
 
 TEST(PrimitiveCell128, from_json_rejects_empty_string) {
     parcel::json_t j = {{"k", "u128"}, {"v", ""}};
-    EXPECT_THROW(parcel::U128Cell::from_json(j, registry()), std::runtime_error);
+    EXPECT_THROW(parcel::U128Cell::from_json(j, registry()), parcel::json_t::exception);
 }
 
 TEST(PrimitiveCell128, from_json_rejects_lone_minus_for_i128) {
     parcel::json_t j = {{"k", "i128"}, {"v", "-"}};
-    EXPECT_THROW(parcel::I128Cell::from_json(j, registry()), std::runtime_error);
+    EXPECT_THROW(parcel::I128Cell::from_json(j, registry()), parcel::json_t::exception);
 }
 
 TEST(PrimitiveCell128, from_json_rejects_u128_overflow) {
     // 2^128 = u128_max + 1 — one over the addressable range.
     parcel::json_t j = {{"k", "u128"}, {"v", "340282366920938463463374607431768211456"}};
-    EXPECT_THROW(parcel::U128Cell::from_json(j, registry()), std::runtime_error);
+    EXPECT_THROW(parcel::U128Cell::from_json(j, registry()), parcel::json_t::exception);
 }
 
 TEST(PrimitiveCell128, from_json_rejects_u128_far_overflow) {
     // Way above u128 range — earlier digits already overflow the accumulator.
     parcel::json_t j = {{"k", "u128"}, {"v", "1000000000000000000000000000000000000000"}};
-    EXPECT_THROW(parcel::U128Cell::from_json(j, registry()), std::runtime_error);
+    EXPECT_THROW(parcel::U128Cell::from_json(j, registry()), parcel::json_t::exception);
 }
 
 TEST(PrimitiveCell128, from_json_rejects_i128_positive_overflow) {
     // i128_max + 1 = 2^127. Just over the positive bound.
     parcel::json_t j = {{"k", "i128"}, {"v", "170141183460469231731687303715884105728"}};
-    EXPECT_THROW(parcel::I128Cell::from_json(j, registry()), std::runtime_error);
+    EXPECT_THROW(parcel::I128Cell::from_json(j, registry()), parcel::json_t::exception);
 }
 
 TEST(PrimitiveCell128, from_json_accepts_i128_min_boundary) {
@@ -475,7 +479,88 @@ TEST(PrimitiveCell128, from_json_accepts_i128_min_boundary) {
 TEST(PrimitiveCell128, from_json_rejects_i128_negative_overflow) {
     // |i128_min| + 1 = 2^127 + 1 — one past the negative bound.
     parcel::json_t j = {{"k", "i128"}, {"v", "-170141183460469231731687303715884105729"}};
-    EXPECT_THROW(parcel::I128Cell::from_json(j, registry()), std::runtime_error);
+    EXPECT_THROW(parcel::I128Cell::from_json(j, registry()), parcel::json_t::exception);
 }
 
-#endif  // PARCEL_HAS_INT128
+#endif  // COMMONS_HAS_INT128
+
+// ---------------------------------------------------------------------------
+// Complex cells (commons cs8..cu64 / cf32 / cf64). Wire form is a
+// [real, imaginary] JSON array via commons' adl_serializer<std::complex<T>>.
+
+static_assert(parcel::CellLike<parcel::Cf32Cell>);
+static_assert(parcel::CellLike<parcel::Cf64Cell>);
+static_assert(parcel::CellLike<parcel::Cs8Cell>);
+static_assert(parcel::CellLike<parcel::Cu64Cell>);
+
+TEST(PrimitiveCellComplex, kind_ids_and_to_string) {
+    EXPECT_EQ(parcel::Cf32Cell::kind_id, "cf32");
+    EXPECT_EQ(parcel::Cf64Cell::kind_id, "cf64");
+    EXPECT_EQ(parcel::Cs8Cell::kind_id, "cs8");
+    EXPECT_EQ(parcel::Cu16Cell::kind_id, "cu16");
+
+    const parcel::Cs32Cell c{comms::cs32{3, -4}};
+    EXPECT_EQ(c.to_string(), "(3, -4)");
+}
+
+TEST(PrimitiveCellComplex, to_json_is_real_imag_array) {
+    const parcel::Cf64Cell c{comms::cf64{1.5, -2.5}};
+    const auto j = c.to_json();
+    EXPECT_EQ(j["k"], "cf64");
+    ASSERT_TRUE(j["v"].is_array());
+    ASSERT_EQ(j["v"].size(), 2u);
+    EXPECT_DOUBLE_EQ(j["v"][0].get<double>(), 1.5);
+    EXPECT_DOUBLE_EQ(j["v"][1].get<double>(), -2.5);
+}
+
+TEST(PrimitiveCellComplex, float_round_trip_via_registry) {
+    const auto cell = parcel::Cf32Cell::of(comms::cf32{1.25F, -3.5F});
+    const auto restored = registry().cell_from_json(cell->to_json());
+    EXPECT_EQ(*restored, *cell);
+    auto* typed = dynamic_cast<parcel::Cf32Cell*>(restored.get());
+    ASSERT_NE(typed, nullptr);
+    EXPECT_EQ(typed->get(), (comms::cf32{1.25F, -3.5F}));
+}
+
+TEST(PrimitiveCellComplex, signed_and_unsigned_int_round_trip_via_registry) {
+    const auto cs = parcel::Cs8Cell::of(comms::cs8{-5, 6});
+    const auto cu = parcel::Cu64Cell::of(comms::cu64{7, 8});
+    EXPECT_EQ(*registry().cell_from_json(cs->to_json()), *cs);
+    EXPECT_EQ(*registry().cell_from_json(cu->to_json()), *cu);
+}
+
+TEST(PrimitiveCellComplex, typed_list_round_trip_via_registry) {
+    parcel::Cf64ListCell list{comms::cf64{1.0, 2.0}, comms::cf64{3.0, 4.0}};
+    const auto j = list.to_json();
+    EXPECT_EQ(j["k"], "l:cf64");
+    const auto restored = registry().cell_from_json(j);
+    EXPECT_EQ(*restored, list);
+}
+
+TEST(PrimitiveCellComplex, typed_map_round_trip_via_registry) {
+    parcel::Cf32MapCell m;
+    m.emplace("re", comms::cf32{0.5F, 1.5F});
+    const auto j = m.to_json();
+    EXPECT_EQ(j["k"], "m:cf32");
+    const auto restored = registry().cell_from_json(j);
+    EXPECT_EQ(*restored, m);
+}
+
+TEST(PrimitiveCellComplex, registered_in_default_registry) {
+    const auto& reg = registry();
+    for (const auto* kind : {"cs8",
+                             "cs16",
+                             "cs32",
+                             "cs64",
+                             "cu8",
+                             "cu16",
+                             "cu32",
+                             "cu64",
+                             "cf32",
+                             "cf64",
+                             "l:cf64",
+                             "m:cf32",
+                             "hm:cu16"}) {
+        EXPECT_TRUE(reg.contains(kind)) << "missing kind: " << kind;
+    }
+}

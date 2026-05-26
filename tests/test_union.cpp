@@ -330,7 +330,7 @@ struct Payload {
 class PayloadCell : public parcel::StructCell<PayloadCell, Payload, "payload"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Payload"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -446,7 +446,7 @@ public:
 
     [[maybe_unused]] static parcel::cell_type_descriptor_t descriptor() {
         static const auto d = std::make_shared<parcel::SimpleCellTypeDescriptor<LiarUnionCell>>(
-            parcel::descriptor::MetaInfo{.name = "LiarU"});
+            parcel::DisplayInfo{.name = "LiarU"});
         return d;
     }
 };
@@ -477,7 +477,7 @@ public:
 
     [[maybe_unused]] static parcel::cell_type_descriptor_t descriptor() {
         static const auto d = std::make_shared<parcel::SimpleCellTypeDescriptor<BadCloneCell>>(
-            parcel::descriptor::MetaInfo{.name = "BadClone"});
+            parcel::DisplayInfo{.name = "BadClone"});
         return d;
     }
 };
@@ -515,7 +515,7 @@ public:
 
     [[maybe_unused]] static parcel::cell_type_descriptor_t descriptor() {
         static const auto d = std::make_shared<parcel::SimpleCellTypeDescriptor<ThrowingCell>>(
-            parcel::descriptor::MetaInfo{.name = "Throwing"});
+            parcel::DisplayInfo{.name = "Throwing"});
         return d;
     }
 };

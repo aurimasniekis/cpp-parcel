@@ -12,6 +12,7 @@
 #include <parcel/builtins.h>
 #include <parcel/cell.h>
 #include <parcel/common.h>
+#include <parcel/commons.h>
 #include <parcel/defaults.h>
 #include <parcel/descriptor.h>
 #include <parcel/error.h>

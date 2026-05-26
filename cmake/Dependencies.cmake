@@ -13,6 +13,20 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(nlohmann_json)
 
+# aurimasniekis/cpp-commons — header-only vocabulary types (Color, Icon,
+# DisplayInfo, Flag/FlagSet, FixedString). Declared after nlohmann/json so the
+# commons headers see <nlohmann/json.hpp> on the include path and self-enable
+# their JSON hooks (COMMONS_WITH_NLOHMANN_JSON auto-detects via __has_include);
+# we leave COMMONS_WITH_NLOHMANN_JSON OFF so commons does not fetch its own copy.
+FetchContent_Declare(
+    commons
+    URL      https://github.com/aurimasniekis/cpp-commons/archive/refs/tags/v0.1.3.tar.gz
+    URL_HASH SHA256=2f5615ac96a1a1dddda5424ed75c0d1a0142f115f215502562f479ef138fc30d
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    FIND_PACKAGE_ARGS 0.1
+)
+FetchContent_MakeAvailable(commons)
+
 if(PARCEL_BUILD_TESTS)
     set(INSTALL_GTEST OFF CACHE INTERNAL "")
     set(BUILD_GMOCK   OFF CACHE INTERNAL "")

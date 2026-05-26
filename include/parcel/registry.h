@@ -61,6 +61,11 @@ struct BuiltinsOptions {
      *        `UnixMillisCell`, `DurationMsCell`, `YmdCell`, `PathCell`.
      */
     bool std = true;
+    /**
+     * @brief Register the commons cells: `ColorCell`, `IconCell`,
+     *        `DisplayInfoCell`, `FlagCell`, `FlagSetCell`.
+     */
+    bool commons = true;
 };
 
 /**

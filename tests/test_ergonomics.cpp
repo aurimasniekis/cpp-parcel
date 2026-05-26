@@ -23,7 +23,7 @@ struct Person {
 class PersonCell : public parcel::StructCell<PersonCell, Person, "person"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Person"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -41,7 +41,7 @@ struct Address {
 class AddressCell : public parcel::StructCell<AddressCell, Address, "address"> {
 public:
     using StructCell::StructCell;
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Address"};
     }
     [[maybe_unused]] static auto field_descriptors() {
@@ -55,31 +55,43 @@ public:
 // B6: variadic register_kinds / register_cells
 
 TEST(RegistryVariadic, register_kinds_via_descriptors) {
-    parcel::ParcelRegistry reg{parcel::BuiltinsOptions{
-        .primitives = false, .collections = false, .typed_collections = false, .std = false}};
+    parcel::ParcelRegistry reg{parcel::BuiltinsOptions{.primitives = false,
+                                                       .collections = false,
+                                                       .typed_collections = false,
+                                                       .std = false,
+                                                       .commons = false}};
     reg.register_kinds(PersonCell::descriptor(), AddressCell::descriptor());
     EXPECT_TRUE(reg.contains(PersonCell::kind_id));
     EXPECT_TRUE(reg.contains(AddressCell::kind_id));
 }
 
 TEST(RegistryVariadic, register_cells_via_types) {
-    parcel::ParcelRegistry reg{parcel::BuiltinsOptions{
-        .primitives = false, .collections = false, .typed_collections = false, .std = false}};
+    parcel::ParcelRegistry reg{parcel::BuiltinsOptions{.primitives = false,
+                                                       .collections = false,
+                                                       .typed_collections = false,
+                                                       .std = false,
+                                                       .commons = false}};
     reg.register_cells<PersonCell, AddressCell>();
     EXPECT_TRUE(reg.contains(PersonCell::kind_id));
     EXPECT_TRUE(reg.contains(AddressCell::kind_id));
 }
 
 TEST(RegistryVariadic, register_kinds_returns_self_for_chaining) {
-    parcel::ParcelRegistry reg{parcel::BuiltinsOptions{
-        .primitives = false, .collections = false, .typed_collections = false, .std = false}};
+    parcel::ParcelRegistry reg{parcel::BuiltinsOptions{.primitives = false,
+                                                       .collections = false,
+                                                       .typed_collections = false,
+                                                       .std = false,
+                                                       .commons = false}};
     auto& self = reg.register_kinds(PersonCell::descriptor());
     EXPECT_EQ(&self, &reg);
 }
 
 TEST(RegistryVariadic, register_kinds_rejects_null_descriptor_mid_pack) {
-    parcel::ParcelRegistry reg{parcel::BuiltinsOptions{
-        .primitives = false, .collections = false, .typed_collections = false, .std = false}};
+    parcel::ParcelRegistry reg{parcel::BuiltinsOptions{.primitives = false,
+                                                       .collections = false,
+                                                       .typed_collections = false,
+                                                       .std = false,
+                                                       .commons = false}};
     parcel::cell_type_descriptor_t null_desc;
     EXPECT_THROW(
         { reg.register_kinds(PersonCell::descriptor(), null_desc, AddressCell::descriptor()); },
@@ -87,8 +99,11 @@ TEST(RegistryVariadic, register_kinds_rejects_null_descriptor_mid_pack) {
 }
 
 TEST(RegistryVariadic, register_cells_chains_with_register_kinds) {
-    parcel::ParcelRegistry reg{parcel::BuiltinsOptions{
-        .primitives = false, .collections = false, .typed_collections = false, .std = false}};
+    parcel::ParcelRegistry reg{parcel::BuiltinsOptions{.primitives = false,
+                                                       .collections = false,
+                                                       .typed_collections = false,
+                                                       .std = false,
+                                                       .commons = false}};
     auto& self = reg.register_cells<PersonCell>().register_kinds(AddressCell::descriptor());
     EXPECT_EQ(&self, &reg);
     EXPECT_TRUE(reg.contains(PersonCell::kind_id));

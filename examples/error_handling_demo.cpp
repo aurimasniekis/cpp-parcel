@@ -19,7 +19,7 @@ class OrderCell : public parcel::StructCell<OrderCell, Order, "order"> {
 public:
     using StructCell::StructCell;
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Order"};
     }
 

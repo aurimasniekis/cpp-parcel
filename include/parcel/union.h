@@ -50,7 +50,7 @@ public:
      * @brief Construct with the given descriptive metadata.
      * @param meta Descriptive metadata.
      */
-    explicit UnionCellTypeDescriptor(descriptor::MetaInfo meta) : base_t(std::move(meta)) {}
+    explicit UnionCellTypeDescriptor(DisplayInfo meta) : base_t(std::move(meta)) {}
 
     /** @brief Compile-time array of every alternative's kind id. */
     [[nodiscard]] static constexpr std::array<std::string_view, sizeof...(Ts)> alternatives() {
@@ -317,7 +317,7 @@ public:
      * @return Shared `UnionCellTypeDescriptor<Ts...>` instance.
      */
     static cell_type_descriptor_t descriptor() {
-        static const auto d = std::make_shared<UnionCellTypeDescriptor<Ts...>>(descriptor::MetaInfo{
+        static const auto d = std::make_shared<UnionCellTypeDescriptor<Ts...>>(DisplayInfo{
             .name = "Union",
             .description = "Closed-set polymorphic cell (one of fixed alternatives)",
         });

@@ -2,26 +2,32 @@
 
 /**
  * @file common.h
- * @brief Platform-detected 128-bit integer aliases, the `PARCEL_HAS_INT128`
- *        feature macro, and shared compile-time kind-id machinery.
+ * @brief The shared vocabulary aliases re-exported from commons and the
+ *        compile-time kind-id machinery.
  *
- * GCC/Clang expose `__int128_t` / `__uint128_t` via the `__SIZEOF_INT128__`
- * predefined macro. When present, `PARCEL_HAS_INT128` is defined and the
- * `parcel::i128` / `parcel::u128` aliases become available. Headers that
- * declare 128-bit cells (`primitive.h`, `builtins.h`) gate them behind this
- * macro so the library still compiles on platforms that lack 128-bit support.
+ * The `parcel::i128` / `parcel::u128` aliases are re-exported from
+ * `comms::i128` / `comms::u128` and become available when 128-bit integers
+ * exist on the toolchain. Headers that declare 128-bit cells (`primitive.h`,
+ * `builtins.h`) gate them behind commons' own `COMMONS_HAS_INT128` feature
+ * macro (defined in `<commons/types.hpp>`), so the gate always matches the
+ * source of the types.
  *
- * In addition, this header centralizes the shared bits used by composite
- * cells to synthesize their wire `kind_id` at compile time:
+ * This header also re-exports `parcel::FixedString` and `parcel::DisplayInfo`
+ * from commons, and centralizes the shared bits used by composite cells to
+ * synthesize their wire `kind_id` at compile time:
  *
- *   - `fixed_string<N>` — C++20 class-NTTP string-literal carrier.
+ *   - `FixedString<N>` — C++20 class-NTTP string-literal carrier.
  *   - `id_join_v<Parts...>` — concatenate `std::string_view` references.
- *   - `id_join_lit_v<Parts...>` — concatenate `fixed_string` literals.
- *   - `prefixed_id_v<Prefix, Tail>` — `fixed_string` literal prefix joined
+ *   - `id_join_lit_v<Parts...>` — concatenate `FixedString` literals.
+ *   - `prefixed_id_v<Prefix, Tail>` — `FixedString` literal prefix joined
  *     with a `std::string_view` reference tail.
  */
 
 #include <parcel/json.h>
+
+#include <commons/display_info.hpp>
+#include <commons/fixed_string.hpp>
+#include <commons/types.hpp>
 
 #include <algorithm>
 #include <array>
@@ -32,51 +38,41 @@
 
 namespace parcel {
 
-#if defined(__SIZEOF_INT128__)
-/**
- * @brief Defined when the compiler provides 128-bit integer types.
- *
- * Headers that declare 128-bit cells gate their declarations behind this
- * macro. Doxygen sees it as always defined so the 128-bit aliases render
- * regardless of the host compiler.
- */
-#define PARCEL_HAS_INT128 1
+#if defined(COMMONS_HAS_INT128)
+/** @brief Unsigned 128-bit integer — re-exported from `comms::u128`. */
+using comms::u128;
 
-/** @brief Unsigned 128-bit integer alias for `__uint128_t`. */
-using u128 = __uint128_t;
-
-/** @brief Signed 128-bit integer alias for `__int128_t`. */
-using i128 = __int128_t;
+/** @brief Signed 128-bit integer — re-exported from `comms::i128`. */
+using comms::i128;
 #endif
 
 /**
  * @brief Compile-time fixed-length string usable as a non-type template
  *        parameter (C++20 class-NTTP).
  *
- * Lets a `StructCell<Derived, Payload, "person">` carry the bare struct id
- * in its template signature, and lets library authors compose kind ids out
- * of fixed string literals via `id_join_lit_v`.
+ * Parcel reuses commons' `comms::FixedString` rather than maintaining its own
+ * carrier: it is API-compatible for the way parcel uses it (`.view()` only)
+ * and is itself used by commons as a class-NTTP placeholder, so it is valid in
+ * that role here too.
  *
- * @tparam N Length of the string literal including its trailing `'\0'`.
+ * Exposed unqualified as `parcel::FixedString`; it lets a
+ * `StructCell<Derived, Payload, "person">` carry the bare struct id in its
+ * template signature and lets library authors compose kind ids out of fixed
+ * string literals via `id_join_lit_v`.
  */
-template <std::size_t N>
-struct fixed_string {
-    // C-style array storage is required for the C++20 structural-NTTP
-    // representation of a string literal — std::array is not yet a valid
-    // NTTP storage type for this use.
-    char data[N]{};  // NOLINT(modernize-avoid-c-arrays)
+using comms::FixedString;
 
-    constexpr fixed_string(const char (&s)[N]) {  // NOLINT(modernize-avoid-c-arrays)
-        for (std::size_t i = 0; i < N; ++i) {
-            data[i] = s[i];
-        }
-    }
-
-    /** @brief View of the string excluding the trailing `'\0'`. */
-    [[nodiscard]] constexpr std::string_view view() const {
-        return {data, N - 1};
-    }
-};
+/**
+ * @brief Descriptive metadata attached to a cell or descriptor — re-exported
+ *        from `comms::DisplayInfo`.
+ *
+ * Every `ICell` may carry an optional `DisplayInfo` (name / description / typed
+ * `comms::Icon` / typed `comms::Color`), serialized under the JSON key `"d"`.
+ * It is purely descriptive metadata for UI/tooling use and never affects the
+ * wire identity (`"k"`) or value (`"v"`) of a cell. It serializes via commons'
+ * free ADL `to_json` / `from_json` (there is no member `to_json()`).
+ */
+using DisplayInfo = comms::DisplayInfo;
 
 /**
  * @brief Compile-time concatenation of `std::string_view` references into a
@@ -108,16 +104,16 @@ template <std::string_view const&... Parts>
 inline constexpr std::string_view id_join_v = id_join<Parts...>::value;
 
 /**
- * @brief Compile-time concatenation of `fixed_string` literals into a
+ * @brief Compile-time concatenation of `FixedString` literals into a
  *        single `std::string_view` with static storage.
  *
  * Library-author-facing variant: lets a CRTP base form its own
- * `kind_id` directly from string literals plus a `fixed_string` NTTP it
+ * `kind_id` directly from string literals plus a `FixedString` NTTP it
  * received as a template parameter, without forcing the author to declare
  * a bridge `static constexpr std::string_view`:
  *
  * @code{.cpp}
- * template <typename Self, parcel::fixed_string EventId>
+ * template <typename Self, parcel::FixedString EventId>
  * class BaseEvent : public parcel::SelfStructCell<Self> {
  *     static constexpr std::string_view kind_id =
  *         parcel::id_join_lit_v<"s:event:", EventId>;
@@ -125,9 +121,9 @@ inline constexpr std::string_view id_join_v = id_join<Parts...>::value;
  * };
  * @endcode
  *
- * @tparam Parts `fixed_string` literals to concatenate in order.
+ * @tparam Parts `FixedString` literals to concatenate in order.
  */
-template <fixed_string... Parts>
+template <FixedString... Parts>
 struct id_join_lit {
     static constexpr std::size_t total_size = (Parts.view().size() + ... + 0);
     static constexpr auto buf = []() {
@@ -140,11 +136,11 @@ struct id_join_lit {
 };
 
 /** @brief Convenience alias yielding the joined `std::string_view`. */
-template <fixed_string... Parts>
+template <FixedString... Parts>
 inline constexpr std::string_view id_join_lit_v = id_join_lit<Parts...>::value;
 
 /**
- * @brief Compile-time concatenation of a `fixed_string` literal prefix with
+ * @brief Compile-time concatenation of a `FixedString` literal prefix with
  *        a `std::string_view` reference tail into one `std::string_view`
  *        with static storage.
  *
@@ -162,7 +158,7 @@ inline constexpr std::string_view id_join_lit_v = id_join_lit<Parts...>::value;
  * @tparam Tail   Reference to a `std::string_view` constant appended after
  *                @p Prefix.
  */
-template <fixed_string Prefix, std::string_view const& Tail>
+template <FixedString Prefix, std::string_view const& Tail>
 struct prefixed_id {
     static constexpr std::size_t total_size = Prefix.view().size() + Tail.size();
     static constexpr auto buf = []() {
@@ -175,7 +171,7 @@ struct prefixed_id {
 };
 
 /** @brief Convenience alias yielding the joined `std::string_view`. */
-template <fixed_string Prefix, std::string_view const& Tail>
+template <FixedString Prefix, std::string_view const& Tail>
 inline constexpr std::string_view prefixed_id_v = prefixed_id<Prefix, Tail>::value;
 
 }  // namespace parcel

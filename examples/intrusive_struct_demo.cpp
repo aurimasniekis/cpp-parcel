@@ -25,7 +25,7 @@ namespace demo {
 //    - Provides a hook (`event_field_descriptors`) the concrete cell
 //      implements to declare its own fields.
 
-template <typename Self, parcel::fixed_string EventId>
+template <typename Self, parcel::FixedString EventId>
 class BaseEvent : public parcel::SelfStructCell<Self> {
 public:
     static constexpr std::string_view kind_id = parcel::id_join_lit_v<"s:event:", EventId>;
@@ -41,7 +41,7 @@ public:
         timestamp_ = v;
     }
 
-    [[maybe_unused]] static parcel::descriptor::MetaInfo meta_info() {
+    [[maybe_unused]] static parcel::DisplayInfo meta_info() {
         return {.name = "Event", .description = "Common event base"};
     }
 
@@ -70,7 +70,7 @@ public:
     }
 };
 
-void print_section(std::string_view title) {
+void print_section(const std::string_view title) {
     std::cout << "\n--- " << title << " ---\n";
 }
 

@@ -67,7 +67,7 @@ public:
 
     static cell_type_descriptor_t descriptor() {
         static const auto d =
-            std::make_shared<SimpleCellTypeDescriptor<SystemTimePointCell>>(descriptor::MetaInfo{
+            std::make_shared<SimpleCellTypeDescriptor<SystemTimePointCell>>(DisplayInfo{
                 .name = "SystemTimePoint", .description = "Wall-clock time, second resolution"});
         return d;
     }
@@ -113,7 +113,7 @@ public:
 
     static cell_type_descriptor_t descriptor() {
         static const auto d =
-            std::make_shared<SimpleCellTypeDescriptor<UnixMillisCell>>(descriptor::MetaInfo{
+            std::make_shared<SimpleCellTypeDescriptor<UnixMillisCell>>(DisplayInfo{
                 .name = "UnixMillis", .description = "Wall-clock time as Unix epoch milliseconds"});
         return d;
     }
@@ -158,7 +158,7 @@ public:
 
     static cell_type_descriptor_t descriptor() {
         static const auto d = std::make_shared<SimpleCellTypeDescriptor<DurationMsCell>>(
-            descriptor::MetaInfo{.name = "DurationMs", .description = "Duration in milliseconds"});
+            DisplayInfo{.name = "DurationMs", .description = "Duration in milliseconds"});
         return d;
     }
 };
@@ -198,9 +198,8 @@ public:
     }
 
     static cell_type_descriptor_t descriptor() {
-        static const auto d =
-            std::make_shared<SimpleCellTypeDescriptor<YmdCell>>(descriptor::MetaInfo{
-                .name = "YearMonthDay", .description = "Calendar date (ISO-8601 YYYY-MM-DD)"});
+        static const auto d = std::make_shared<SimpleCellTypeDescriptor<YmdCell>>(DisplayInfo{
+            .name = "YearMonthDay", .description = "Calendar date (ISO-8601 YYYY-MM-DD)"});
         return d;
     }
 

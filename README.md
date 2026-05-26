@@ -169,8 +169,8 @@ any of those four batches.
 | `double`        | `DoubleCell` | `f64`     |                                                        |
 | `std::string`   | `StringCell` | `string`  |                                                        |
 
-The 128-bit primitives are gated on `PARCEL_HAS_INT128` and are present
-for any compiler that exposes `__int128`.
+The 128-bit primitives are gated on `COMMONS_HAS_INT128` (from commons) and are
+present for any compiler that exposes `__int128`.
 
 ### Containers
 
