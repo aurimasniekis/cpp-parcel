@@ -54,8 +54,8 @@ pinned to a release tarball:
 include(FetchContent)
 FetchContent_Declare(
         cpp-parcel
-        URL https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.1.0.tar.gz
-        URL_HASH SHA256=d9d5550580c30cc30816448b986d1dcd8e0c267a8f98ad3b2d496d806d834020
+        URL https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.0.tar.gz
+        URL_HASH SHA256=<REPLACE_WITH_RELEASE_TARBALL_SHA256>
 )
 FetchContent_MakeAvailable(cpp-parcel)
 
@@ -73,10 +73,10 @@ Drop a wrap file in `subprojects/parcel.wrap`:
 
 ```ini
 [wrap-file]
-directory       = cpp-parcel-0.1.0
-source_url      = https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.1.0.tar.gz
-source_filename = cpp-parcel-0.1.0.tar.gz
-source_hash     = d9d5550580c30cc30816448b986d1dcd8e0c267a8f98ad3b2d496d806d834020
+directory       = cpp-parcel-0.2.0
+source_url      = https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.0.tar.gz
+source_filename = cpp-parcel-0.2.0.tar.gz
+source_hash     = <REPLACE_WITH_RELEASE_TARBALL_SHA256>
 
 [provide]
 parcel = parcel_dep
@@ -85,7 +85,7 @@ parcel = parcel_dep
 Then in your `meson.build`:
 
 ```meson
-parcel_dep = dependency('parcel', version: '>=0.1.0')
+parcel_dep = dependency('parcel', version: '>=0.2.0')
 
 executable('my_app', 'main.cpp', dependencies: [parcel_dep])
 ```

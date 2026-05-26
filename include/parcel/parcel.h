@@ -31,12 +31,12 @@
 namespace parcel {
 
 /** @brief Library version as a dotted `MAJOR.MINOR.PATCH` string. */
-inline constexpr std::string_view version = "0.1.0";
+inline constexpr std::string_view version = "0.2.0";
 
 /** @brief Major version component. */
 inline constexpr int version_major = 0;
 /** @brief Minor version component. */
-inline constexpr int version_minor = 1;
+inline constexpr int version_minor = 2;
 /** @brief Patch version component. */
 inline constexpr int version_patch = 0;
 
