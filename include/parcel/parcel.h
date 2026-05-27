@@ -24,6 +24,7 @@
 #include <parcel/registry.h>
 #include <parcel/struct.h>
 #include <parcel/union.h>
+#include <parcel/version.h>
 #include <parcel/walk.h>
 
 #include <string_view>
@@ -31,13 +32,13 @@
 namespace parcel {
 
 /** @brief Library version as a dotted `MAJOR.MINOR.PATCH` string. */
-inline constexpr std::string_view version = "0.2.0";
+inline constexpr std::string_view version = PARCEL_VERSION_STRING;
 
 /** @brief Major version component. */
-inline constexpr int version_major = 0;
+inline constexpr int version_major = PARCEL_VERSION_MAJOR;
 /** @brief Minor version component. */
-inline constexpr int version_minor = 2;
+inline constexpr int version_minor = PARCEL_VERSION_MINOR;
 /** @brief Patch version component. */
-inline constexpr int version_patch = 0;
+inline constexpr int version_patch = PARCEL_VERSION_PATCH;
 
 }  // namespace parcel

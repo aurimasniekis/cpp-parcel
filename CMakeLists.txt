@@ -34,12 +34,20 @@ include(Sanitizers)
 include(Coverage)
 include(Dependencies)
 
+# Generate parcel/version.h from the project version (single source of truth).
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/parcel/version.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/include/parcel/version.h"
+    @ONLY
+)
+
 add_library(parcel INTERFACE)
 add_library(parcel::parcel ALIAS parcel)
 
 target_include_directories(parcel
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
 
@@ -122,6 +130,11 @@ if(PARCEL_INSTALL)
     install(DIRECTORY include/parcel
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         FILES_MATCHING PATTERN "*.h"
+    )
+
+    install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/include/parcel/version.h"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/parcel
     )
 
     install(EXPORT parcelTargets

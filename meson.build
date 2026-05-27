@@ -9,6 +9,18 @@ project('parcel', 'cpp',
     meson_version: '>=1.3.0',
 )
 
+version_parts = meson.project_version().split('.')
+
+parcel_version_conf = configuration_data()
+parcel_version_conf.set('PROJECT_VERSION_MAJOR', version_parts[0])
+parcel_version_conf.set('PROJECT_VERSION_MINOR', version_parts[1])
+parcel_version_conf.set('PROJECT_VERSION_PATCH', version_parts[2])
+parcel_version_conf.set('PROJECT_VERSION', meson.project_version())
+
+# Generates the build-side include/parcel/version.h. include_directories('include')
+# resolves to both the source-side and build-side include/, so it is found.
+subdir('include/parcel')
+
 json_dep = dependency('nlohmann_json', version: '>=3.12.0',
     fallback: ['nlohmann_json', 'nlohmann_json_dep'])
 
@@ -22,7 +34,10 @@ parcel_dep = declare_dependency(
 
 meson.override_dependency('parcel', parcel_dep)
 
-install_subdir('include/parcel', install_dir: get_option('includedir'))
+install_subdir('include/parcel',
+    install_dir: get_option('includedir'),
+    exclude_files: ['version.h.in', 'meson.build'],
+)
 
 import('pkgconfig').generate(
     name: 'parcel',
