@@ -20,7 +20,7 @@ include(FetchContent)
 FetchContent_Declare(
         cpp-parcel
         URL      https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.1.tar.gz
-        URL_HASH SHA256=<REPLACE_WITH_RELEASE_TARBALL_SHA256>
+        URL_HASH SHA256=d9c81134a53d589c477cdb2b8afc162eade74050f2f3d783e4a6d1a6237b3085
 )
 
 # Fallback: pull by git tag. Less reproducible than the tarball form (the tag
