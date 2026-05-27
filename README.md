@@ -3,6 +3,7 @@
 Wrappable, wire-transferable C++23 value system with JSON serialization.
 
 [![CI](https://github.com/aurimasniekis/cpp-parcel/actions/workflows/ci.yml/badge.svg)](https://github.com/aurimasniekis/cpp-parcel/actions/workflows/ci.yml)
+[![Docs](https://github.com/aurimasniekis/cpp-parcel/actions/workflows/docs.yml/badge.svg)](https://aurimasniekis.github.io/cpp-parcel/)
 
 ## What is parcel?
 
@@ -54,8 +55,8 @@ pinned to a release tarball:
 include(FetchContent)
 FetchContent_Declare(
         cpp-parcel
-        URL https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.0.tar.gz
-        URL_HASH SHA256=5040c50fcd0ad001be761a35166a89a1792be667fbc436747a5ddbc8a377fe6a
+        URL https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.1.tar.gz
+        URL_HASH SHA256=<REPLACE_WITH_RELEASE_TARBALL_SHA256>
 )
 FetchContent_MakeAvailable(cpp-parcel)
 
@@ -73,10 +74,10 @@ Drop a wrap file in `subprojects/parcel.wrap`:
 
 ```ini
 [wrap-file]
-directory       = cpp-parcel-0.2.0
-source_url      = https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.0.tar.gz
-source_filename = cpp-parcel-0.2.0.tar.gz
-source_hash     = 5040c50fcd0ad001be761a35166a89a1792be667fbc436747a5ddbc8a377fe6a
+directory       = cpp-parcel-0.2.1
+source_url      = https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.1.tar.gz
+source_filename = cpp-parcel-0.2.1.tar.gz
+source_hash     = <REPLACE_WITH_RELEASE_TARBALL_SHA256>
 
 [provide]
 parcel = parcel_dep
@@ -85,7 +86,7 @@ parcel = parcel_dep
 Then in your `meson.build`:
 
 ```meson
-parcel_dep = dependency('parcel', version: '>=0.2.0')
+parcel_dep = dependency('parcel', version: '>=0.2.1')
 
 executable('my_app', 'main.cpp', dependencies: [parcel_dep])
 ```
