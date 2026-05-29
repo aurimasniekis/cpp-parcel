@@ -20,12 +20,27 @@ FetchContent_MakeAvailable(nlohmann_json)
 # we leave COMMONS_WITH_NLOHMANN_JSON OFF so commons does not fetch its own copy.
 FetchContent_Declare(
     commons
-    URL      https://github.com/aurimasniekis/cpp-commons/archive/refs/tags/v0.1.3.tar.gz
-    URL_HASH SHA256=2f5615ac96a1a1dddda5424ed75c0d1a0142f115f215502562f479ef138fc30d
+    URL      https://github.com/aurimasniekis/cpp-commons/archive/refs/tags/v0.1.5.tar.gz
+    URL_HASH SHA256=1c98ee66a8ac5bfd8b8580ddf775e5d34018ce21670c9e14f9cc2179901f521f
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     FIND_PACKAGE_ARGS 0.1
 )
 FetchContent_MakeAvailable(commons)
+
+# aurimasniekis/cpp-ulid — optional, only when PARCEL_WITH_ULID is ON. Linking
+# ulid::ulid lets <parcel/ext/ulid.h>'s UlidCell compile and (because commons
+# auto-detects <ulid/ulid.h>) enables commons' own COMMONS_WITH_ULID too. Same
+# coordinates commons fetches.
+if(PARCEL_WITH_ULID)
+    FetchContent_Declare(
+        ulid
+        URL      https://github.com/aurimasniekis/cpp-ulid/archive/refs/tags/v1.0.0.tar.gz
+        URL_HASH SHA256=2c7cb1b67be889fd3a783aa1188b72545e1becc6f36cb25c7a7c6361177f1515
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+        FIND_PACKAGE_ARGS 1.0.0
+    )
+    FetchContent_MakeAvailable(ulid)
+endif()
 
 if(PARCEL_BUILD_TESTS)
     set(INSTALL_GTEST OFF CACHE INTERNAL "")

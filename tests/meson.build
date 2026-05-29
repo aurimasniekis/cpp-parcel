@@ -16,6 +16,8 @@ parcel_tests = executable('parcel_tests',
         'test_ergonomics.cpp',
         'test_std_interop.cpp',
         'test_walk.cpp',
+        'test_commons.cpp',
+        'test_ulid.cpp',
     ],
     dependencies: [parcel_dep, gtest_dep, gtest_main_dep],
 )

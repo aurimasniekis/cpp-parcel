@@ -72,7 +72,8 @@ parcel::ParcelRegistry basic_registry() {
                                 .collections = false,
                                 .typed_collections = false,
                                 .std = false,
-                                .commons = false});
+                                .commons = false,
+                                .ulid = false});
     reg.register_kind(parcel::I32Cell::descriptor());
     reg.register_kind(parcel::StringCell::descriptor());
     reg.register_kind(parcel::U8Cell::descriptor());
@@ -166,7 +167,8 @@ TEST(Registry, duplicate_register_overwrites_without_growing) {
                                 .collections = false,
                                 .typed_collections = false,
                                 .std = false,
-                                .commons = false});
+                                .commons = false,
+                                .ulid = false});
     reg.register_kind(parcel::I32Cell::descriptor());
     reg.register_kind(parcel::StringCell::descriptor());
     EXPECT_EQ(reg.count(), 2u);
@@ -187,7 +189,8 @@ TEST(Registry, kinds_returned_in_sorted_order) {
                                 .collections = false,
                                 .typed_collections = false,
                                 .std = false,
-                                .commons = false});
+                                .commons = false,
+                                .ulid = false});
     reg.register_kind(parcel::U8Cell::descriptor());
     reg.register_kind(parcel::StringCell::descriptor());
     reg.register_kind(parcel::I32Cell::descriptor());
@@ -581,7 +584,8 @@ TEST(Registry, define_referenced_unregistered_throws) {
                                 .collections = false,
                                 .typed_collections = false,
                                 .std = false,
-                                .commons = false});
+                                .commons = false,
+                                .ulid = false});
     reg.register_kind(parcel::I32Cell::descriptor());
     reg.register_kind(PersonCell::descriptor());
     EXPECT_THROW((void)reg.define("s:person"), std::runtime_error);
@@ -638,7 +642,8 @@ TEST(Registry, opt_out_yields_empty_registry) {
                                       .collections = false,
                                       .typed_collections = false,
                                       .std = false,
-                                      .commons = false});
+                                      .commons = false,
+                                      .ulid = false});
     EXPECT_EQ(reg.count(), 0u);
 }
 

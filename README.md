@@ -201,6 +201,29 @@ always serialize identically.
 | `YmdCell`             | `time:ymd`         | ISO-8601 `"YYYY-MM-DD"` string |
 | `PathCell`            | `fs:path`          | UTF-8 portable path string     |
 
+### Commons vocabulary cells
+
+Adapters for the [`aurimasniekis/cpp-commons`](https://github.com/aurimasniekis/cpp-commons)
+value types live in `<parcel/commons.h>` and are pre-registered when
+`BuiltinsOptions::commons` is true (the default):
+
+| cell                    | wire kind             | wire shape                       |
+|-------------------------|-----------------------|----------------------------------|
+| `ColorCell`             | `color`               | hex string                       |
+| `IconCell`              | `icon`                | `"set:name"` string              |
+| `DisplayInfoCell`       | `display_info`        | JSON object                      |
+| `FlagCell`              | `flag`                | flag name string                 |
+| `FlagSetCell`           | `flag_set`            | array of flag names              |
+| `SemVerCell`            | `semver`              | canonical version string         |
+| `VersionConstraintCell` | `version_constraint`  | npm-style range string           |
+| `OriginCell`            | `origin`              | `{"kind", …fields}` object       |
+
+`SemVerCell` / `VersionConstraintCell` carry `comms::SemVer` /
+`comms::VersionConstraint`; a malformed range throws on decode (commons'
+`parse` throws), matching parcel's strict-deserialization policy. `OriginCell`
+carries a move-only `comms::OriginPtr` and resolves the `"kind"` discriminator
+against `comms::GlobalOriginRegistry` on decode (an unknown kind throws).
+
 User-defined cells live in two more namespaces: structs under `s:`
 (e.g. `s:person`) and unions under `u:` with the alternatives joined by
 commas (e.g. `u:i32,string`).
@@ -721,6 +744,21 @@ its storage. `TypedMapCell` constructs from a paired range and exposes
 `path::generic_string()`. Wire kind: `fs:path`. Pre-registered when
 `BuiltinsOptions::std` is true.
 
+### ULID — `<parcel/ext/ulid.h>`
+
+`UlidCell` wraps [`ulid::Ulid`](https://github.com/aurimasniekis/cpp-ulid) as a
+26-character Crockford base32 string. Wire kind: `ulid`. Unlike the other
+adapters the ULID dependency is **opt-in** — the header is gated on
+`PARCEL_HAS_ULID` (auto-detected via `__has_include(<ulid/ulid.h>)`, or
+predefined by the build option), so it is inert unless you turn it on:
+
+- **CMake:** `-DPARCEL_WITH_ULID=ON` fetches `aurimasniekis/cpp-ulid` and
+  defines `PARCEL_HAS_ULID=1`.
+- **Meson:** `-Dulid=true` pulls the `ulid` wrap and adds the same define.
+
+When enabled, `UlidCell` is pre-registered alongside the commons cells (toggle
+with `BuiltinsOptions::ulid`); the flag is present but inert when ULID is off.
+
 ### Hash-backed maps — `<parcel/unordered_map.h>`
 
 `TypedHashMapCell<T>` and `HashMapCell` are `std::unordered_map`-backed
@@ -780,16 +818,17 @@ common invocations.
 
 ### CMake options
 
-| option                      | default      | effect                                         |
-|-----------------------------|--------------|------------------------------------------------|
-| `PARCEL_BUILD_TESTS`        | top-level ON | Build `parcel_tests` and register with CTest   |
-| `PARCEL_BUILD_EXAMPLES`     | top-level ON | Build `parcel_*_demo` example targets          |
-| `PARCEL_BUILD_DOCS`         | OFF          | Add the `parcel_docs` Doxygen target           |
-| `PARCEL_ENABLE_CLANG_TIDY`  | OFF          | Run clang-tidy during the build                |
-| `PARCEL_ENABLE_SANITIZERS`  | OFF          | Compile with AddressSanitizer + UBSan          |
-| `PARCEL_ENABLE_COVERAGE`    | OFF          | Compile with Clang source-based coverage       |
-| `PARCEL_WARNINGS_AS_ERRORS` | top-level ON | `-Werror` / `/WX`                              |
-| `PARCEL_INSTALL`            | top-level ON | Generate install rules and CMake package files |
+| option                      | default      | effect                                                  |
+|-----------------------------|--------------|---------------------------------------------------------|
+| `PARCEL_BUILD_TESTS`        | top-level ON | Build `parcel_tests` and register with CTest            |
+| `PARCEL_BUILD_EXAMPLES`     | top-level ON | Build `parcel_*_demo` example targets                   |
+| `PARCEL_BUILD_DOCS`         | OFF          | Add the `parcel_docs` Doxygen target                    |
+| `PARCEL_ENABLE_CLANG_TIDY`  | OFF          | Run clang-tidy during the build                         |
+| `PARCEL_ENABLE_SANITIZERS`  | OFF          | Compile with AddressSanitizer + UBSan                   |
+| `PARCEL_ENABLE_COVERAGE`    | OFF          | Compile with Clang source-based coverage                |
+| `PARCEL_WARNINGS_AS_ERRORS` | top-level ON | `-Werror` / `/WX`                                       |
+| `PARCEL_INSTALL`            | top-level ON | Generate install rules and CMake package files          |
+| `PARCEL_WITH_ULID`          | OFF          | Enable the ULID cell (fetches `aurimasniekis/cpp-ulid`) |
 
 Configure presets in `CMakePresets.json`: `debug`, `release`,
 `relwithdebinfo`, `minsizerel`. Each has a matching build and test
@@ -817,16 +856,18 @@ directory for editor tooling.
 
 ### Meson
 
-`meson.options` exposes `tests` and `examples` toggles (both default
-`false` for downstream consumers). To build everything locally:
+`meson.options` exposes `tests`, `examples`, and `ulid` toggles (all
+default `false` for downstream consumers). To build everything locally:
 
 ```
 meson setup build-meson -Dtests=true -Dexamples=true
 meson test  -C build-meson
 ```
 
-Wraps for `nlohmann_json` and `gtest` are pre-fetched under
-`subprojects/` so Meson can build offline.
+`-Dulid=true` enables the ULID cell (resolves the `ulid` wrap and defines
+`PARCEL_HAS_ULID=1`). Wraps for `nlohmann_json`, `commons`, `ulid`, and
+`gtest` are declared under `subprojects/` so Meson can build offline once
+fetched.
 
 ### Continuous integration
 

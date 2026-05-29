@@ -1,2 +1,3 @@
 option('tests',    type: 'boolean', value: false, description: 'Build parcel tests')
 option('examples', type: 'boolean', value: false, description: 'Build parcel examples')
+option('ulid',     type: 'boolean', value: false, description: 'Enable the ULID cell')

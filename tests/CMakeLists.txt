@@ -15,6 +15,7 @@ add_executable(parcel_tests
     test_std_interop.cpp
     test_walk.cpp
     test_commons.cpp
+    test_ulid.cpp
 )
 
 target_link_libraries(parcel_tests

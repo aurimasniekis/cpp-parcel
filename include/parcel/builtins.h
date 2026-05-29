@@ -27,6 +27,7 @@
 #include <parcel/commons.h>
 #include <parcel/ext/chrono.h>
 #include <parcel/ext/filesystem.h>
+#include <parcel/ext/ulid.h>
 #include <parcel/list.h>
 #include <parcel/map.h>
 #include <parcel/primitive.h>
@@ -360,9 +361,10 @@ inline void register_std(ParcelRegistry& reg) {
 /**
  * @brief Register the commons-adapter cells into @p reg.
  *
- * Registers `ColorCell`, `IconCell`, `DisplayInfoCell`, `FlagCell`, and
- * `FlagSetCell` from `parcel/commons.h` so a default-constructed registry
- * dispatches the `aurimasniekis/cpp-commons` vocabulary types out of the box.
+ * Registers `ColorCell`, `IconCell`, `DisplayInfoCell`, `FlagCell`,
+ * `FlagSetCell`, `SemVerCell`, `VersionConstraintCell`, and `OriginCell` from
+ * `parcel/commons.h` so a default-constructed registry dispatches the
+ * `aurimasniekis/cpp-commons` vocabulary types out of the box.
  *
  * @param reg Registry to populate.
  */
@@ -372,7 +374,24 @@ inline void register_commons(ParcelRegistry& reg) {
     reg.register_kind(DisplayInfoCell::descriptor());
     reg.register_kind(FlagCell::descriptor());
     reg.register_kind(FlagSetCell::descriptor());
+    reg.register_kind(SemVerCell::descriptor());
+    reg.register_kind(VersionConstraintCell::descriptor());
+    reg.register_kind(OriginCell::descriptor());
 }
+
+#if PARCEL_HAS_ULID
+/**
+ * @brief Register the ULID-adapter cell into @p reg.
+ *
+ * Registers `UlidCell` from `parcel/ext/ulid.h`. Only compiled when the ULID
+ * dependency is enabled (`PARCEL_HAS_ULID`).
+ *
+ * @param reg Registry to populate.
+ */
+inline void register_ulid(ParcelRegistry& reg) {
+    reg.register_kind(UlidCell::descriptor());
+}
+#endif
 
 /**
  * @brief Apply the @p opts toggles to populate @p reg with built-in cells.
@@ -395,6 +414,11 @@ inline void register_builtins(ParcelRegistry& reg, const BuiltinsOptions opts = 
     if (opts.commons) {
         register_commons(reg);
     }
+#if PARCEL_HAS_ULID
+    if (opts.ulid) {
+        register_ulid(reg);
+    }
+#endif
 }
 
 // Defined here (rather than in registry.h) so the registry header doesn't

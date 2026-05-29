@@ -28,6 +28,7 @@ option(PARCEL_ENABLE_SANITIZERS   "Build with ASan + UBSan (Debug)"     OFF)
 option(PARCEL_ENABLE_COVERAGE     "Build with Clang source-based coverage" OFF)
 option(PARCEL_WARNINGS_AS_ERRORS  "Treat compiler warnings as errors"   ${PROJECT_IS_TOP_LEVEL})
 option(PARCEL_INSTALL             "Generate install rules for parcel"   ${PROJECT_IS_TOP_LEVEL})
+option(PARCEL_WITH_ULID           "Enable the ULID cell (fetches aurimasniekis/cpp-ulid)" OFF)
 
 include(CompilerWarnings)
 include(Sanitizers)
@@ -54,6 +55,13 @@ target_include_directories(parcel
 target_compile_features(parcel INTERFACE cxx_std_23)
 
 target_link_libraries(parcel INTERFACE nlohmann_json::nlohmann_json commons::commons)
+
+# Optional ULID cell. Linking ulid also auto-enables commons' COMMONS_WITH_ULID
+# (commons detects <ulid/ulid.h> on the include path).
+if(PARCEL_WITH_ULID AND TARGET ulid::ulid)
+    target_link_libraries(parcel INTERFACE ulid::ulid)
+    target_compile_definitions(parcel INTERFACE PARCEL_HAS_ULID=1)
+endif()
 
 if(PARCEL_ENABLE_CLANG_TIDY)
     find_program(PARCEL_CLANG_TIDY_EXE NAMES clang-tidy REQUIRED)
@@ -109,7 +117,7 @@ if(PARCEL_BUILD_DOCS)
     )
 endif()
 
-if(PARCEL_INSTALL AND (DEFINED nlohmann_json_SOURCE_DIR OR DEFINED commons_SOURCE_DIR))
+if(PARCEL_INSTALL AND (DEFINED nlohmann_json_SOURCE_DIR OR DEFINED commons_SOURCE_DIR OR DEFINED ulid_SOURCE_DIR))
     message(STATUS
         "parcel: PARCEL_INSTALL disabled — a dependency (nlohmann_json and/or commons) "
         "was built via FetchContent and cannot be re-exported. Install the dependency "

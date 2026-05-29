@@ -41,8 +41,9 @@ namespace parcel {
  *
  * Defaults register everything: primitives, the heterogeneous `ListCell` /
  * `MapCell`, a `TypedListCell<P>` / `TypedMapCell<P>` for every primitive
- * `P`, and the std-adapter cells (`SystemTimePointCell`, `UnixMillisCell`,
- * `DurationMsCell`, `YmdCell`, `PathCell`).
+ * `P`, the std-adapter cells (`SystemTimePointCell`, `UnixMillisCell`,
+ * `DurationMsCell`, `YmdCell`, `PathCell`), the commons-adapter cells, and —
+ * when the ULID dependency is enabled (`PARCEL_HAS_ULID`) — `UlidCell`.
  *
  * @see register_builtins
  */
@@ -63,9 +64,15 @@ struct BuiltinsOptions {
     bool std = true;
     /**
      * @brief Register the commons cells: `ColorCell`, `IconCell`,
-     *        `DisplayInfoCell`, `FlagCell`, `FlagSetCell`.
+     *        `DisplayInfoCell`, `FlagCell`, `FlagSetCell`, `SemVerCell`,
+     *        `VersionConstraintCell`, `OriginCell`.
      */
     bool commons = true;
+    /**
+     * @brief Register `UlidCell` (only takes effect when the ULID dependency
+     *        is enabled — `PARCEL_HAS_ULID`; an inert flag otherwise).
+     */
+    bool ulid = true;
 };
 
 /**

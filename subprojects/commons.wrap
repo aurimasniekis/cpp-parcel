@@ -1,0 +1,8 @@
+[wrap-file]
+directory       = cpp-commons-0.1.5
+source_url      = https://github.com/aurimasniekis/cpp-commons/archive/refs/tags/v0.1.5.tar.gz
+source_filename = cpp-commons-0.1.5.tar.gz
+source_hash     = 1c98ee66a8ac5bfd8b8580ddf775e5d34018ce21670c9e14f9cc2179901f521f
+
+[provide]
+commons = commons_dep
