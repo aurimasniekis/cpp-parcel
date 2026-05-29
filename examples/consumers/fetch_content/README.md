@@ -7,9 +7,9 @@ end-to-end.
 The `CMakeLists.txt` in this directory shows two ways to pull parcel:
 
 1. **Tarball + `URL_HASH` (active, preferred for production).** Reproducible —
-   the build pins both a tag *and* a checksum. The current pin is `v0.2.1`
+   the build pins both a tag *and* a checksum. The current pin is `v0.2.2`
    with SHA256
-   `d9c81134a53d589c477cdb2b8afc162eade74050f2f3d783e4a6d1a6237b3085`.
+   `<REPLACE_WITH_RELEASE_TARBALL_SHA256>`.
 2. **Git tag (commented fallback).** Useful if you need to track an unreleased
    commit. Less reproducible: the tag could be re-pointed and you would not
    notice.
@@ -25,7 +25,7 @@ cmake --build /tmp/parcel-consumer-build
 Expected output (something close to):
 
 ```
-parcel version: 0.2.1
+parcel version: 0.2.2
 wire payload  : {"k":"i32","v":42}
 restored kind : i32
 restored value: 42

@@ -15,12 +15,12 @@ include(FetchContent)
 # Pin a published release tarball + its SHA256. Reproducible, no git required
 # at configure time, fastest to fetch on CI. To compute SHA256 yourself:
 #
-#   curl -sL https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.1.tar.gz \
+#   curl -sL https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.2.tar.gz \
 #     | shasum -a 256
 FetchContent_Declare(
         cpp-parcel
-        URL      https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.1.tar.gz
-        URL_HASH SHA256=d9c81134a53d589c477cdb2b8afc162eade74050f2f3d783e4a6d1a6237b3085
+        URL      https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.2.tar.gz
+        URL_HASH SHA256=<REPLACE_WITH_RELEASE_TARBALL_SHA256>
 )
 
 # Fallback: pull by git tag. Less reproducible than the tarball form (the tag
@@ -30,7 +30,7 @@ FetchContent_Declare(
 # FetchContent_Declare(
 #         cpp-parcel
 #         GIT_REPOSITORY https://github.com/aurimasniekis/cpp-parcel.git
-#         GIT_TAG v0.2.1
+#         GIT_TAG v0.2.2
 #         GIT_SHALLOW TRUE
 # )
 
