@@ -9,7 +9,7 @@ The `CMakeLists.txt` in this directory shows two ways to pull parcel:
 1. **Tarball + `URL_HASH` (active, preferred for production).** Reproducible —
    the build pins both a tag *and* a checksum. The current pin is `v0.2.3`
    with SHA256
-   `<REPLACE_WITH_RELEASE_TARBALL_SHA256>`.
+   `6fe85fa191dadbd16449250b0f77653dd773152a5fb3cfb37c4f6c9a09eb60db`.
 2. **Git tag (commented fallback).** Useful if you need to track an unreleased
    commit. Less reproducible: the tag could be re-pointed and you would not
    notice.
