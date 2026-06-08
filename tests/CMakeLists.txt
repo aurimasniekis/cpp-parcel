@@ -15,6 +15,11 @@ add_executable(parcel_tests
     test_std_interop.cpp
     test_walk.cpp
     test_commons.cpp
+    test_reason.cpp
+    test_ability.cpp
+    test_identity.cpp
+    test_audit.cpp
+    test_metadata.cpp
     test_ulid.cpp
 )
 

@@ -362,9 +362,13 @@ inline void register_std(ParcelRegistry& reg) {
  * @brief Register the commons-adapter cells into @p reg.
  *
  * Registers `ColorCell`, `IconCell`, `DisplayInfoCell`, `FlagCell`,
- * `FlagSetCell`, `SemVerCell`, `VersionConstraintCell`, and `OriginCell` from
- * `parcel/commons.h` so a default-constructed registry dispatches the
- * `aurimasniekis/cpp-commons` vocabulary types out of the box.
+ * `FlagSetCell`, `SemVerCell`, `VersionConstraintCell`, `OriginCell`,
+ * `ReasonCell`, `FailureReasonCell`, `AbilityCell`, `IdentityCell`,
+ * `AuditRecordCell`, `AuditRecordsCell`, and the metadata `ValueCell` /
+ * `ObjectCell` / `ArrayCell` from `parcel/commons.h` so a default-constructed
+ * registry dispatches the `aurimasniekis/cpp-commons` vocabulary types out of
+ * the box. (The templated `ChangeAuditRecord*` cells are opt-in per element
+ * cell and are not registered here.)
  *
  * @param reg Registry to populate.
  */
@@ -377,6 +381,15 @@ inline void register_commons(ParcelRegistry& reg) {
     reg.register_kind(SemVerCell::descriptor());
     reg.register_kind(VersionConstraintCell::descriptor());
     reg.register_kind(OriginCell::descriptor());
+    reg.register_kind(ReasonCell::descriptor());
+    reg.register_kind(FailureReasonCell::descriptor());
+    reg.register_kind(AbilityCell::descriptor());
+    reg.register_kind(IdentityCell::descriptor());
+    reg.register_kind(AuditRecordCell::descriptor());
+    reg.register_kind(AuditRecordsCell::descriptor());
+    reg.register_kind(ValueCell::descriptor());
+    reg.register_kind(ObjectCell::descriptor());
+    reg.register_kind(ArrayCell::descriptor());
 }
 
 #if PARCEL_HAS_ULID

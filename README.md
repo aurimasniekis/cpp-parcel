@@ -217,12 +217,37 @@ value types live in `<parcel/commons.h>` and are pre-registered when
 | `SemVerCell`            | `semver`              | canonical version string         |
 | `VersionConstraintCell` | `version_constraint`  | npm-style range string           |
 | `OriginCell`            | `origin`              | `{"kind", …fields}` object       |
+| `ReasonCell`            | `reason`              | `{"kind", …fields}` object       |
+| `FailureReasonCell`     | `failure_reason`      | `{"kind", …fields}` object       |
+| `AbilityCell`           | `ability`             | `{"kind", …fields}` object       |
+| `IdentityCell`          | `identity`            | `{"kind", …fields}` object       |
+| `AuditRecordCell`       | `audit_record`        | JSON object                      |
+| `AuditRecordsCell`      | `audit_records`       | JSON array of audit records      |
+| `ValueCell`             | `md:v`                | dynamic JSON-shaped value        |
+| `ObjectCell`            | `md:o`                | string-keyed map of `md::Value`  |
+| `ArrayCell`             | `md:a`                | array of `md::Value`             |
 
 `SemVerCell` / `VersionConstraintCell` carry `comms::SemVer` /
 `comms::VersionConstraint`; a malformed range throws on decode (commons'
-`parse` throws), matching parcel's strict-deserialization policy. `OriginCell`
-carries a move-only `comms::OriginPtr` and resolves the `"kind"` discriminator
-against `comms::GlobalOriginRegistry` on decode (an unknown kind throws).
+`parse` throws), matching parcel's strict-deserialization policy. `OriginCell`,
+`ReasonCell`, `FailureReasonCell`, `AbilityCell`, and `IdentityCell` carry
+move-only commons `…Ptr` handles and resolve the inner `"kind"` discriminator
+against the matching commons global registry on decode (an unknown kind throws;
+`FailureReasonCell` additionally rejects a non-failure reason kind). Because the
+sets are open, third-party kinds that self-register decode correctly too.
+`AuditRecordCell` / `AuditRecordsCell` carry `comms::AuditRecord` /
+`comms::AuditRecords` (a capped log — capacity is not serialized, so a
+within-capacity log round-trips exactly). The templated
+`ChangeAuditRecordCell<P>` / `ChangeAuditRecordsCell<P>` (wire kinds
+`change_audit_record:<P>` / `change_audit_records:<P>`) carry the before/after
+change variants and are opt-in per element cell `P` — register one with
+`ChangeAuditRecordCell<SomeCell>::descriptor()`, like `TypedListCell<P>`. The
+`ValueCell` / `ObjectCell` / `ArrayCell` adapters carry the `comms::md` dynamic
+value tree.
+
+Each cell family lives in a focused header under `<parcel/commons/>` (e.g.
+`<parcel/commons/reason.h>`); `<parcel/commons.h>` is an umbrella that includes
+them all.
 
 User-defined cells live in two more namespaces: structs under `s:`
 (e.g. `s:person`) and unions under `u:` with the alternatives joined by
