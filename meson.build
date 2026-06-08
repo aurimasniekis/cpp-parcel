@@ -1,5 +1,5 @@
 project('parcel', 'cpp',
-    version: '0.2.3',
+    version: '0.2.4',
     license: 'MIT',
     default_options: [
         'cpp_std=c++23',

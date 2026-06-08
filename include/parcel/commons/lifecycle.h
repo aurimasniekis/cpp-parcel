@@ -243,10 +243,10 @@ public:
 
     static cell_type_descriptor_t descriptor() {
         static const auto d =
-            std::make_shared<SimpleCellTypeDescriptor<StatusTransitionTimelineCell>>(DisplayInfo{
-                .name = "StatusTransitionTimeline",
-                .description = std::string("Lifecycle transition history (status of ") +
-                               std::string(P::kind_id) + ")"});
+            std::make_shared<SimpleCellTypeDescriptor<StatusTransitionTimelineCell>>(
+                DisplayInfo{.name = "StatusTransitionTimeline",
+                            .description = std::string("Lifecycle transition history (status of ") +
+                                           std::string(P::kind_id) + ")"});
         return d;
     }
 };
