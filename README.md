@@ -207,25 +207,29 @@ Adapters for the [`aurimasniekis/cpp-commons`](https://github.com/aurimasniekis/
 value types live in `<parcel/commons.h>` and are pre-registered when
 `BuiltinsOptions::commons` is true (the default):
 
-| cell                    | wire kind             | wire shape                       |
-|-------------------------|-----------------------|----------------------------------|
-| `ColorCell`             | `color`               | hex string                       |
-| `IconCell`              | `icon`                | `"set:name"` string              |
-| `DisplayInfoCell`       | `display_info`        | JSON object                      |
-| `FlagCell`              | `flag`                | flag name string                 |
-| `FlagSetCell`           | `flag_set`            | array of flag names              |
-| `SemVerCell`            | `semver`              | canonical version string         |
-| `VersionConstraintCell` | `version_constraint`  | npm-style range string           |
-| `OriginCell`            | `origin`              | `{"kind", …fields}` object       |
-| `ReasonCell`            | `reason`              | `{"kind", …fields}` object       |
-| `FailureReasonCell`     | `failure_reason`      | `{"kind", …fields}` object       |
-| `AbilityCell`           | `ability`             | `{"kind", …fields}` object       |
-| `IdentityCell`          | `identity`            | `{"kind", …fields}` object       |
-| `AuditRecordCell`       | `audit_record`        | JSON object                      |
-| `AuditRecordsCell`      | `audit_records`       | JSON array of audit records      |
-| `ValueCell`             | `md:v`                | dynamic JSON-shaped value        |
-| `ObjectCell`            | `md:o`                | string-keyed map of `md::Value`  |
-| `ArrayCell`             | `md:a`                | array of `md::Value`             |
+| cell                             | wire kind                                     | wire shape                      |
+|----------------------------------|-----------------------------------------------|---------------------------------|
+| `ColorCell`                      | `color`                                       | hex string                      |
+| `IconCell`                       | `icon`                                        | `"set:name"` string             |
+| `DisplayInfoCell`                | `display_info`                                | JSON object                     |
+| `FlagCell`                       | `flag`                                        | flag name string                |
+| `FlagSetCell`                    | `flag_set`                                    | array of flag names             |
+| `SemVerCell`                     | `semver`                                      | canonical version string        |
+| `VersionConstraintCell`          | `version_constraint`                          | npm-style range string          |
+| `OriginCell`                     | `origin`                                      | `{"kind", …fields}` object      |
+| `ReasonCell`                     | `reason`                                      | `{"kind", …fields}` object      |
+| `FailureReasonCell`              | `failure_reason`                              | `{"kind", …fields}` object      |
+| `AbilityCell`                    | `ability`                                     | `{"kind", …fields}` object      |
+| `IdentityCell`                   | `identity`                                    | `{"kind", …fields}` object      |
+| `AuditRecordCell`                | `audit_record`                                | JSON object                     |
+| `AuditRecordsCell`               | `audit_records`                               | JSON array of audit records     |
+| `ValueCell`                      | `md:v`                                        | dynamic JSON-shaped value       |
+| `ObjectCell`                     | `md:o`                                        | string-keyed map of `md::Value` |
+| `ArrayCell`                      | `md:a`                                        | array of `md::Value`            |
+| `LifecycleStatusCell`            | `lifecycle_status`                            | status name string              |
+| `StatusTransitionCell<>`         | `status_transition:lifecycle_status`          | JSON object                     |
+| `StatusReportCell<>`             | `status_report:lifecycle_status`              | JSON object                     |
+| `StatusTransitionTimelineCell<>` | `status_transition_timeline:lifecycle_status` | JSON array of transitions       |
 
 `SemVerCell` / `VersionConstraintCell` carry `comms::SemVer` /
 `comms::VersionConstraint`; a malformed range throws on decode (commons'
@@ -243,7 +247,24 @@ within-capacity log round-trips exactly). The templated
 change variants and are opt-in per element cell `P` — register one with
 `ChangeAuditRecordCell<SomeCell>::descriptor()`, like `TypedListCell<P>`. The
 `ValueCell` / `ObjectCell` / `ArrayCell` adapters carry the `comms::md` dynamic
-value tree.
+value tree. The lifecycle adapters carry the `comms::Lifecycle` status-history
+family. `LifecycleStatusCell` carries the built-in `comms::LifecycleStatus`. The
+lifecycle types are generic on a status `T`, so `StatusTransitionCell<P>`,
+`StatusReportCell<P>`, and `StatusTransitionTimelineCell<P>` are parameterized on
+a status *cell* `P` whose `P::storage_t` is `T` — exactly like `TypedListCell<P>`
+/ `ChangeAuditRecordCell<P>`. `P` defaults to `LifecycleStatusCell`, so
+`StatusTransitionCell<>` (etc.) is the built-in case and is pre-registered; for a
+custom status type, supply your own status cell and register it opt-in, e.g.
+`reg.register_kind(parcel::StatusTransitionCell<MyStatusCell>::descriptor())`
+(wire kind `status_transition:<MyStatusCell::kind_id>`). `P::storage_t` must be a
+`comms::StatusType` (default-constructible, copyable, equality-comparable) and
+JSON-serializable, and statuses are rendered for `to_string()` through `P`.
+`StatusTransitionTimelineCell<P>` carries the transition history of a
+`comms::StatusTransitionTimeline<T>` (the live timeline owns a mutex and is
+non-copyable, so the cell holds its serializable `StatusTransition` array — the
+same shape commons encodes — and bridges to/from a live timeline via its
+`StatusTransitionTimeline` constructor and `load_into()`). Timestamps and
+durations encode as epoch / count milliseconds (sub-millisecond ticks truncate).
 
 Each cell family lives in a focused header under `<parcel/commons/>` (e.g.
 `<parcel/commons/reason.h>`); `<parcel/commons.h>` is an umbrella that includes

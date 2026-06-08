@@ -20,8 +20,8 @@ FetchContent_MakeAvailable(nlohmann_json)
 # we leave COMMONS_WITH_NLOHMANN_JSON OFF so commons does not fetch its own copy.
 FetchContent_Declare(
     commons
-    URL      https://github.com/aurimasniekis/cpp-commons/archive/refs/tags/v0.1.6.tar.gz
-    URL_HASH SHA256=04047f92aca576555346b17f628e516b9fe5caab1dbdc8a853245a3a83f27be0
+    URL      https://github.com/aurimasniekis/cpp-commons/archive/refs/tags/v0.1.7.tar.gz
+    URL_HASH SHA256=6b878325f9e84f4079daef5e8ca71cf610b220e4051abff3809a6f2af138db34
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     FIND_PACKAGE_ARGS 0.1
 )

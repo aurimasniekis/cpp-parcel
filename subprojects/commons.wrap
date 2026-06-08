@@ -1,8 +1,8 @@
 [wrap-file]
-directory       = cpp-commons-0.1.6
-source_url      = https://github.com/aurimasniekis/cpp-commons/archive/refs/tags/v0.1.6.tar.gz
-source_filename = cpp-commons-0.1.6.tar.gz
-source_hash     = 04047f92aca576555346b17f628e516b9fe5caab1dbdc8a853245a3a83f27be0
+directory       = cpp-commons-0.1.7
+source_url      = https://github.com/aurimasniekis/cpp-commons/archive/refs/tags/v0.1.7.tar.gz
+source_filename = cpp-commons-0.1.7.tar.gz
+source_hash     = 6b878325f9e84f4079daef5e8ca71cf610b220e4051abff3809a6f2af138db34
 
 [provide]
 commons = commons_dep

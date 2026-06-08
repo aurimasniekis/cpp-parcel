@@ -26,6 +26,11 @@
  *   - `ChangeAuditRecordCell<P>`  → `"change_audit_record:" + P::kind_id` (opt-in).
  *   - `ChangeAuditRecordsCell<P>` → `"change_audit_records:" + P::kind_id` (opt-in).
  *   - `ValueCell` / `ObjectCell` / `ArrayCell` — `comms::md::*` → `"md:v"` / `"md:o"` / `"md:a"`.
+ *   - `LifecycleStatusCell`             — `comms::LifecycleStatus`     → `"lifecycle_status"` (string).
+ *   - `StatusTransitionCell<P>`         — `comms::StatusTransition<P::storage_t>`     → `"status_transition:" + P::kind_id` (object).
+ *   - `StatusReportCell<P>`             — `comms::StatusReport<P::storage_t>`         → `"status_report:" + P::kind_id` (object).
+ *   - `StatusTransitionTimelineCell<P>` — the transition history       → `"status_transition_timeline:" + P::kind_id` (array).
+ *     (`P` defaults to `LifecycleStatusCell`; the `<>` instantiations are registered, other `P` are opt-in.)
  *
  * Each cell reuses commons' ADL `to_json` / `from_json` (auto-enabled because
  * nlohmann/json is on the include path), so the inherited serialization just
@@ -45,6 +50,7 @@
 #include <parcel/commons/flag.h>
 #include <parcel/commons/icon.h>
 #include <parcel/commons/identity.h>
+#include <parcel/commons/lifecycle.h>
 #include <parcel/commons/metadata.h>
 #include <parcel/commons/origin.h>
 #include <parcel/commons/reason.h>

@@ -364,11 +364,14 @@ inline void register_std(ParcelRegistry& reg) {
  * Registers `ColorCell`, `IconCell`, `DisplayInfoCell`, `FlagCell`,
  * `FlagSetCell`, `SemVerCell`, `VersionConstraintCell`, `OriginCell`,
  * `ReasonCell`, `FailureReasonCell`, `AbilityCell`, `IdentityCell`,
- * `AuditRecordCell`, `AuditRecordsCell`, and the metadata `ValueCell` /
- * `ObjectCell` / `ArrayCell` from `parcel/commons.h` so a default-constructed
- * registry dispatches the `aurimasniekis/cpp-commons` vocabulary types out of
- * the box. (The templated `ChangeAuditRecord*` cells are opt-in per element
- * cell and are not registered here.)
+ * `AuditRecordCell`, `AuditRecordsCell`, the metadata `ValueCell` /
+ * `ObjectCell` / `ArrayCell`, the lifecycle `LifecycleStatusCell`, and the
+ * default (`LifecycleStatus`) instantiations of `StatusTransitionCell<>` /
+ * `StatusReportCell<>` / `StatusTransitionTimelineCell<>` from
+ * `parcel/commons.h` so a default-constructed registry dispatches the
+ * `aurimasniekis/cpp-commons` vocabulary types out of the box. (The templated
+ * `ChangeAuditRecord*` cells and the lifecycle cells for a custom status cell
+ * `P` are opt-in per element cell and are not registered here.)
  *
  * @param reg Registry to populate.
  */
@@ -390,6 +393,10 @@ inline void register_commons(ParcelRegistry& reg) {
     reg.register_kind(ValueCell::descriptor());
     reg.register_kind(ObjectCell::descriptor());
     reg.register_kind(ArrayCell::descriptor());
+    reg.register_kind(LifecycleStatusCell::descriptor());
+    reg.register_kind(StatusTransitionCell<>::descriptor());
+    reg.register_kind(StatusReportCell<>::descriptor());
+    reg.register_kind(StatusTransitionTimelineCell<>::descriptor());
 }
 
 #if PARCEL_HAS_ULID

@@ -20,6 +20,7 @@ add_executable(parcel_tests
     test_identity.cpp
     test_audit.cpp
     test_metadata.cpp
+    test_lifecycle.cpp
     test_ulid.cpp
 )
 
