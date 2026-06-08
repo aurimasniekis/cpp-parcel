@@ -11,10 +11,10 @@
 #include <vector>
 
 TEST(parcel, version_string_matches_components) {
-    EXPECT_EQ(parcel::version, "0.2.2");
+    EXPECT_EQ(parcel::version, "0.2.3");
     EXPECT_EQ(parcel::version_major, 0);
     EXPECT_EQ(parcel::version_minor, 2);
-    EXPECT_EQ(parcel::version_patch, 2);
+    EXPECT_EQ(parcel::version_patch, 3);
 }
 
 TEST(parcel, json_dependency_is_wired_up) {
