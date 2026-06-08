@@ -56,7 +56,7 @@ include(FetchContent)
 FetchContent_Declare(
         cpp-parcel
         URL https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.4.tar.gz
-        URL_HASH SHA256=<REPLACE_WITH_RELEASE_TARBALL_SHA256>
+        URL_HASH SHA256=d2c2eedd1d8ea13244780994ef4c9f030ee5e4688c77b7189aa67e6d6bdf148c
 )
 FetchContent_MakeAvailable(cpp-parcel)
 
@@ -77,7 +77,7 @@ Drop a wrap file in `subprojects/parcel.wrap`:
 directory       = cpp-parcel-0.2.4
 source_url      = https://github.com/aurimasniekis/cpp-parcel/archive/refs/tags/v0.2.4.tar.gz
 source_filename = cpp-parcel-0.2.4.tar.gz
-source_hash     = <REPLACE_WITH_RELEASE_TARBALL_SHA256>
+source_hash     = d2c2eedd1d8ea13244780994ef4c9f030ee5e4688c77b7189aa67e6d6bdf148c
 
 [provide]
 parcel = parcel_dep
